@@ -32,7 +32,7 @@ public class Review {
     public Review() {
     }
 
-    public Review(User user, Book book, @NotNull String summary, @NotNull double rating) {
+    public Review(User user, Book book, String summary, double rating) {
         this.user = user;
         this.book = book;
         this.summary = summary;

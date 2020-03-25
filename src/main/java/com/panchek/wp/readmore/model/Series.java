@@ -22,7 +22,7 @@ public class Series {
     private boolean completed;
 
     @ManyToOne
-    private Author Author;
+    private Author author;
 
     @OneToMany(mappedBy = "series")
     private List<Book> books;
@@ -30,10 +30,10 @@ public class Series {
     public Series() {
     }
 
-    public Series(@NotNull String name, boolean completed, com.panchek.wp.readmore.model.Author author, List<Book> books) {
+    public Series(String name, boolean completed, Author author, List<Book> books) {
         this.name = name;
         this.completed = completed;
-        Author = author;
+        this.author = author;
         this.books = books;
     }
 
@@ -61,12 +61,12 @@ public class Series {
         this.completed = completed;
     }
 
-    public com.panchek.wp.readmore.model.Author getAuthor() {
-        return Author;
+    public Author getAuthor() {
+        return author;
     }
 
-    public void setAuthor(com.panchek.wp.readmore.model.Author author) {
-        Author = author;
+    public void setAuthor(Author author) {
+        this.author = author;
     }
 
     public List<Book> getBooks() {

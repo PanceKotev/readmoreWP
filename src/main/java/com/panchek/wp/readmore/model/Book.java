@@ -60,7 +60,7 @@ public class Book {
     public Book() {
     }
 
-    public Book(@NotNull String name, Author author, @NotNull String genre, @NotNull String cover, @NotNull String shortDescription, @NotNull Date datePublished, @NotNull int pageCount) {
+    public Book(String name, Author author,  String genre,  String cover, String shortDescription,  Date datePublished,  int pageCount) {
         this.name = name;
         this.author = author;
         this.genre = genre;
