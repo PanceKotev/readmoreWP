@@ -11,6 +11,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,6 +37,13 @@ public class User extends DateAudit {
     @Email
     @Size(max=40)
     private String email;
+
+    @OneToMany
+    private List<Book> likedBooks;
+
+    @OneToMany(mappedBy = "user")
+    private List<Review> reviews;
+
 
     @NotBlank
     @Size(max=80)
@@ -104,5 +112,21 @@ public class User extends DateAudit {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<Book> getLikedBooks() {
+        return likedBooks;
+    }
+
+    public void setLikedBooks(List<Book> likedBooks) {
+        this.likedBooks = likedBooks;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }
