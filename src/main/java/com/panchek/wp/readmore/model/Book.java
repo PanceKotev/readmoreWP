@@ -29,8 +29,7 @@ public class Book {
     @NotNull
     private String cover;
 
-
-    private List<String> languages;
+    private String language;
 
     @OneToMany(mappedBy = "book")
     private List<Review> reviews;
@@ -110,12 +109,12 @@ public class Book {
         this.cover = cover;
     }
 
-    public List<String> getLanguages() {
-        return languages;
+    public String getLanguage() {
+        return language;
     }
 
-    public void setLanguages(List<String> languages) {
-        this.languages = languages;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public List<Review> getReviews() {
