@@ -1,5 +1,6 @@
 package com.panchek.wp.readmore.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,10 +32,19 @@ public class Book {
 
     private String language;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="liked_books",
+            joinColumns = @JoinColumn(name="book_id"),
+            inverseJoinColumns = @JoinColumn(name="user_id"))
+    private List<User> likedBy;
+
     @OneToMany(mappedBy = "book")
     private List<Review> reviews;
 
     private String downloadList;
+
+    @JsonIgnore
+    private int views;
 
     @NotNull
     private String shortDescription;
@@ -59,11 +69,13 @@ public class Book {
     public Book() {
     }
 
-    public Book(String name, Author author,  String genre,  String cover, String shortDescription,  Date datePublished,  int pageCount) {
+    public Book(String name, Author author,  String genre,  String cover, String language,String downloadList, String shortDescription,  Date datePublished,  int pageCount) {
         this.name = name;
         this.author = author;
         this.genre = genre;
         this.cover = cover;
+        this.language = language;
+        this.downloadList=downloadList;
         this.shortDescription = shortDescription;
         this.datePublished = datePublished;
         this.pageCount = pageCount;
@@ -179,5 +191,21 @@ public class Book {
 
     public void setPopularity(double popularity) {
         this.popularity = popularity;
+    }
+
+    public List<User> getLikedBy() {
+        return likedBy;
+    }
+
+    public void setLikedBy(List<User> likedBy) {
+        this.likedBy = likedBy;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
     }
 }

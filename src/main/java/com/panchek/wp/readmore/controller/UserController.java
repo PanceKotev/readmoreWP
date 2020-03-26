@@ -44,7 +44,7 @@ public class UserController {
     @GetMapping("/{username}")
     public UserProfile getUserProfile(@PathVariable(value = "username") String username){
         User user=userRepository.findByUsername(username).orElseThrow(()->new ResourceNotFoundException("User","Username",username));
-        UserProfile userProfile=new UserProfile(user.getId(),user.getUsername(),user.getName(),user.getCreatedAt());
+        UserProfile userProfile=new UserProfile(user.getId(),user.getUsername(),user.getName(),user.getCreatedAt(),user.getLikedBooks());
         return userProfile;
     }
 

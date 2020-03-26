@@ -38,7 +38,10 @@ public class User extends DateAudit {
     @Size(max=40)
     private String email;
 
-    @OneToMany
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="liked_books",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="book_id"))
     private List<Book> likedBooks;
 
     @OneToMany(mappedBy = "user")

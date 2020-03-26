@@ -1,0 +1,24 @@
+package com.panchek.wp.readmore.service;
+
+import com.panchek.wp.readmore.model.Author;
+import com.panchek.wp.readmore.model.Book;
+import com.panchek.wp.readmore.model.Series;
+import com.panchek.wp.readmore.payload.BookCreation;
+import com.panchek.wp.readmore.payload.BookReturn;
+
+import java.util.List;
+
+public interface BookService {
+    List<BookReturn> listBooksByGenre(String genre);
+
+    List<BookReturn> listBooksBySeries(String seriesName);
+
+    List<BookReturn> listBookByAuthor(String authorName);
+
+    List<BookReturn> listPopularBooks();
+
+    Book createBook(BookCreation bookCreate);
+
+    boolean existsBook(String name);
+
+}
