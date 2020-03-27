@@ -7,6 +7,7 @@ import com.panchek.wp.readmore.payload.BookCreation;
 import com.panchek.wp.readmore.payload.BookReturn;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookService {
     List<BookReturn> listBooksByGenre(String genre);
@@ -21,4 +22,7 @@ public interface BookService {
 
     boolean existsBook(String name);
 
+    BookReturn findBookByName(String bookName);
+
+    List<BookReturn> listSimilarBooksTo(Long id);
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.LineNumberInputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class BookController {
         @Autowired
         BookServiceImpl bookService;
 
-    @GetMapping()
-    public List<BookReturn> getBooksByGenre(@RequestParam String genre){
+    @GetMapping("/genre/{genre}")
+    public List<BookReturn> getBooksByGenre(@PathVariable(value="genre") String genre){
         return bookService.listBooksByGenre(genre);
     }
 
@@ -39,4 +40,21 @@ public class BookController {
                 .buildAndExpand(result.getName()).toUri();
         return ResponseEntity.created(location).body(new ApiResponse(true, "Book created successfully!"));
     }
+
+    @GetMapping("/")
+    public BookReturn getBook(@RequestParam String bookName){
+        return bookService.findBookByName(bookName);
+    }
+
+    @GetMapping("/author/{authorName}")
+    public List<BookReturn> getBooksByAuthor(@PathVariable(value="authorName")String authorName){
+        return bookService.listBookByAuthor(authorName);
+    }
+
+    @GetMapping("/series/{seriesName}")
+    public List<BookReturn> getBooksBySeries(@PathVariable(value="seriesName")String seriesName){
+        return bookService.listBooksBySeries(seriesName);
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.panchek.wp.readmore.payload;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class BookCreation {
@@ -19,7 +20,7 @@ public class BookCreation {
     @NotBlank
     String author;
 
-    Date datePublished;
+    LocalDate datePublished;
 
     int pageCount;
     @NotBlank
@@ -28,7 +29,7 @@ public class BookCreation {
     String downloadList;
 
 
-    public BookCreation(String name, String shortDescription, String genre, String cover, String author, Date datePublished, int pageCount, String language, String downloadList) {
+    public BookCreation(String name, String shortDescription, String genre, String cover, String author, LocalDate datePublished, int pageCount, String language, String downloadList) {
         this.name = name;
         this.shortDescription = shortDescription;
         this.genre = genre;
@@ -80,11 +81,11 @@ public class BookCreation {
         this.author = author;
     }
 
-    public Date getDatePublished() {
+    public LocalDate getDatePublished() {
         return datePublished;
     }
 
-    public void setDatePublished(Date datePublished) {
+    public void setDatePublished(LocalDate datePublished) {
         this.datePublished = datePublished;
     }
 

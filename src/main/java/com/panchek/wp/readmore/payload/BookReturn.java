@@ -1,5 +1,6 @@
 package com.panchek.wp.readmore.payload;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class BookReturn {
@@ -25,13 +26,13 @@ public class BookReturn {
 
     private String seriesName;
 
-    private Date datePublished;
+    private LocalDate datePublished;
 
     private double starRating;
 
     private double popularity;
 
-    public BookReturn(Long id, String name, String authorName, String genre, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, Date datePublished, double starRating, double popularity) {
+    public BookReturn(Long id, String name, String authorName, String genre, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, LocalDate datePublished, double starRating, double popularity) {
         this.id = id;
         this.name = name;
         this.authorName = authorName;
@@ -136,11 +137,11 @@ public class BookReturn {
         this.seriesName = seriesName;
     }
 
-    public Date getDatePublished() {
+    public LocalDate getDatePublished() {
         return datePublished;
     }
 
-    public void setDatePublished(Date datePublished) {
+    public void setDatePublished(LocalDate datePublished) {
         this.datePublished = datePublished;
     }
 

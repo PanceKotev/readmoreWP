@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 @Entity
@@ -54,7 +55,7 @@ public class Book {
     private Series series;
 
     @NotNull
-    private Date datePublished;
+    private LocalDate datePublished;
 
     @NotNull
     private int pageCount;
@@ -69,7 +70,7 @@ public class Book {
     public Book() {
     }
 
-    public Book(String name, Author author,  String genre,  String cover, String language,String downloadList, String shortDescription,  Date datePublished,  int pageCount) {
+    public Book(String name, Author author,  String genre,  String cover, String language,String downloadList, String shortDescription,  LocalDate datePublished,  int pageCount) {
         this.name = name;
         this.author = author;
         this.genre = genre;
@@ -161,11 +162,11 @@ public class Book {
         this.series = series;
     }
 
-    public Date getDatePublished() {
+    public LocalDate getDatePublished() {
         return datePublished;
     }
 
-    public void setDatePublished(Date datePublished) {
+    public void setDatePublished(LocalDate datePublished) {
         this.datePublished = datePublished;
     }
 

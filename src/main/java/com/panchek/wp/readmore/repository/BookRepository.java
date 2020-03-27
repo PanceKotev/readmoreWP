@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book,Long> {
@@ -27,6 +28,8 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     List<Book> findAllByNameContaining(String name);
 
     List<Book> findAllByIdIn(List<Long> bookIds);
+
+    Optional<Book> findByNameEquals(String bookName);
 
     boolean existsByName(String name);
 }
