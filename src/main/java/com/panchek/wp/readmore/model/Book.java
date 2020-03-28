@@ -3,6 +3,7 @@ package com.panchek.wp.readmore.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,8 +26,11 @@ public class Book {
     @JoinColumn(name="author_id", nullable = false)
     private Author author;
 
-    @NotNull
-    private String genre;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="genres_books",
+        joinColumns = @JoinColumn(name="book_id"),
+        inverseJoinColumns = @JoinColumn(name="genre_id"))
+    private List<Genre> genres;
 
     @NotNull
     private String cover;
@@ -60,7 +64,7 @@ public class Book {
     @NotNull
     private int pageCount;
 
-
+    @Range(max = 5)
     private double starRating;
 
 
@@ -70,16 +74,17 @@ public class Book {
     public Book() {
     }
 
-    public Book(String name, Author author,  String genre,  String cover, String language,String downloadList, String shortDescription,  LocalDate datePublished,  int pageCount) {
+    public Book(String name, Author author, List<Genre> genres,  String cover, String language,String downloadList, String shortDescription,  LocalDate datePublished,  int pageCount,Series series) {
         this.name = name;
         this.author = author;
-        this.genre = genre;
+        this.genres = genres;
         this.cover = cover;
         this.language = language;
         this.downloadList=downloadList;
         this.shortDescription = shortDescription;
         this.datePublished = datePublished;
         this.pageCount = pageCount;
+        this.series=series;
     }
 
     public Long getId() {
@@ -106,13 +111,6 @@ public class Book {
         this.author = author;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
 
     public String getCover() {
         return cover;
@@ -208,5 +206,13 @@ public class Book {
 
     public void setViews(int views) {
         this.views = views;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
     }
 }

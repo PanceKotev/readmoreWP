@@ -1,7 +1,10 @@
 package com.panchek.wp.readmore.payload;
 
+import com.panchek.wp.readmore.model.Genre;
+
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public class BookReturn {
     private Long id;
@@ -10,7 +13,7 @@ public class BookReturn {
 
     private String authorName;
 
-    private String genre;
+    private List<String> genreNames;
 
     private String cover;
 
@@ -32,11 +35,11 @@ public class BookReturn {
 
     private double popularity;
 
-    public BookReturn(Long id, String name, String authorName, String genre, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, LocalDate datePublished, double starRating, double popularity) {
+    public BookReturn(Long id, String name, String authorName, List<String> genreNames, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, LocalDate datePublished, double starRating, double popularity) {
         this.id = id;
         this.name = name;
         this.authorName = authorName;
-        this.genre = genre;
+        this.genreNames = genreNames;
         this.cover = cover;
         this.language = language;
         this.nmbrReviews = nmbrReviews;
@@ -73,13 +76,6 @@ public class BookReturn {
         this.authorName = authorName;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
 
     public String getCover() {
         return cover;
@@ -159,5 +155,14 @@ public class BookReturn {
 
     public void setPopularity(double popularity) {
         this.popularity = popularity;
+    }
+
+
+    public List<String> getGenreNames() {
+        return genreNames;
+    }
+
+    public void setGenreNames(List<String> genreNames) {
+        this.genreNames = genreNames;
     }
 }

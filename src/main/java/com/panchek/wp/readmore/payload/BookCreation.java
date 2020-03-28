@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 public class BookCreation {
 
@@ -13,8 +14,8 @@ public class BookCreation {
     @NotBlank
     @Size(min=10, max=150)
     String shortDescription;
-    @NotBlank
-    String genre;
+
+    List<String> genreNames;
     @NotBlank
     String cover;
     @NotBlank
@@ -28,17 +29,20 @@ public class BookCreation {
     @NotBlank
     String downloadList;
 
+    String seriesName;
 
-    public BookCreation(String name, String shortDescription, String genre, String cover, String author, LocalDate datePublished, int pageCount, String language, String downloadList) {
+
+    public BookCreation(String name, String shortDescription, List<String> genreNames, String cover, String author, LocalDate datePublished, int pageCount, String language, String downloadList,String seriesName) {
         this.name = name;
         this.shortDescription = shortDescription;
-        this.genre = genre;
+        this.genreNames = genreNames;
         this.cover = cover;
         this.author = author;
         this.datePublished = datePublished;
         this.pageCount = pageCount;
         this.language = language;
         this.downloadList = downloadList;
+        this.seriesName = seriesName;
     }
 
     public String getName() {
@@ -57,13 +61,6 @@ public class BookCreation {
         this.shortDescription = shortDescription;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
 
     public String getCover() {
         return cover;
@@ -111,5 +108,21 @@ public class BookCreation {
 
     public void setDownloadList(String downloadList) {
         this.downloadList = downloadList;
+    }
+
+    public List<String> getGenreNames() {
+        return genreNames;
+    }
+
+    public void setGenreNames(List<String> genreNames) {
+        this.genreNames = genreNames;
+    }
+
+    public String getSeriesName() {
+        return seriesName;
+    }
+
+    public void setSeriesName(String seriesName) {
+        this.seriesName = seriesName;
     }
 }

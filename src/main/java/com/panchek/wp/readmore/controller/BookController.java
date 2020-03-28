@@ -25,12 +25,12 @@ public class BookController {
 
     @GetMapping("/genre/{genre}")
     public List<BookReturn> getBooksByGenre(@PathVariable(value="genre") String genre){
-        return bookService.listBooksByGenre(genre);
+        return bookService.listBooksByGenre(genre.trim().toLowerCase());
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createBook(@Valid @RequestBody BookCreation bookCreation){
-        if(bookService.existsBook(bookCreation.getName())){
+        if(bookService.existsBook(bookCreation.getName().trim().toLowerCase())){
             return new ResponseEntity(new ApiResponse(false,"A book with that title already exists!"),
                     HttpStatus.BAD_REQUEST);
         }
@@ -43,17 +43,17 @@ public class BookController {
 
     @GetMapping("/")
     public BookReturn getBook(@RequestParam String bookName){
-        return bookService.findBookByName(bookName);
+        return bookService.findBookByName(bookName.trim().toLowerCase());
     }
 
     @GetMapping("/author/{authorName}")
     public List<BookReturn> getBooksByAuthor(@PathVariable(value="authorName")String authorName){
-        return bookService.listBookByAuthor(authorName);
+        return bookService.listBookByAuthor(authorName.trim().toLowerCase());
     }
 
     @GetMapping("/series/{seriesName}")
     public List<BookReturn> getBooksBySeries(@PathVariable(value="seriesName")String seriesName){
-        return bookService.listBooksBySeries(seriesName);
+        return bookService.listBooksBySeries(seriesName.trim().toLowerCase());
     }
 
 

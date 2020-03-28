@@ -1,39 +1,28 @@
 package com.panchek.wp.readmore.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-@Table(name="series")
-public class Series {
-
+public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotNull
     private String name;
 
-
-    private boolean completed;
-
-    @ManyToOne
-    private Author author;
-
-    @OneToMany(mappedBy = "series")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name="genres_books",
+            joinColumns = @JoinColumn(name="genre_id"),
+            inverseJoinColumns = @JoinColumn(name="book_id"))
     private List<Book> books;
 
-    public Series() {
+    public Genre() {
     }
 
-    public Series(String name, boolean completed, Author author) {
+    public Genre(@NotNull String name) {
         this.name = name;
-        this.completed = completed;
-        this.author = author;
     }
 
     public Long getId() {
@@ -50,22 +39,6 @@ public class Series {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public Author getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
     }
 
     public List<Book> getBooks() {

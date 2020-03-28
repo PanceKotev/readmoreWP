@@ -12,6 +12,6 @@ public interface SeriesRepository extends JpaRepository<Series,Long> {
 
     Optional<Series> findByBooksContaining(Book book);
 
-    Optional<Series> findByNameEquals(String name);
+    Optional<Series> findByName(String name);
 
 }

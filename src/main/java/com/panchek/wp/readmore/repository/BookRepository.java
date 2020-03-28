@@ -2,6 +2,7 @@ package com.panchek.wp.readmore.repository;
 
 import com.panchek.wp.readmore.model.Author;
 import com.panchek.wp.readmore.model.Book;
+import com.panchek.wp.readmore.model.Genre;
 import com.panchek.wp.readmore.model.Series;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     List<Book> findAllByViewsIsGreaterThanEqual(int popularity);
 
-    List<Book> findAllByGenreEquals(String genre);
+    List<Book> findAllByGenresContains(Genre genre);
 
     List<Book> findAllBySeries(Series series);
 
@@ -32,4 +33,8 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     Optional<Book> findByNameEquals(String bookName);
 
     boolean existsByName(String name);
+
+    @Query("select avg(b.popularity) from Book b")
+    double getAveragePopularity();
+
 }

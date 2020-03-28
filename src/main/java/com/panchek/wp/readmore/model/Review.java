@@ -2,6 +2,7 @@ package com.panchek.wp.readmore.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class Review {
     private String summary;
 
     @NotNull
+    @Range(max=5)
     private double rating;
 
 

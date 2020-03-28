@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    List<BookReturn> listBooksByGenre(String genre);
+    List<BookReturn> listBooksByGenre(String genreName);
 
     List<BookReturn> listBooksBySeries(String seriesName);
 
@@ -25,4 +25,6 @@ public interface BookService {
     BookReturn findBookByName(String bookName);
 
     List<BookReturn> listSimilarBooksTo(Long id);
+
+
 }

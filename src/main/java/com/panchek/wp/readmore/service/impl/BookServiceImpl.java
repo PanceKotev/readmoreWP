@@ -3,17 +3,17 @@ package com.panchek.wp.readmore.service.impl;
 import com.panchek.wp.readmore.exception.ResourceNotFoundException;
 import com.panchek.wp.readmore.model.Author;
 import com.panchek.wp.readmore.model.Book;
+import com.panchek.wp.readmore.model.Genre;
 import com.panchek.wp.readmore.model.Series;
 import com.panchek.wp.readmore.payload.BookCreation;
 import com.panchek.wp.readmore.payload.BookReturn;
-import com.panchek.wp.readmore.repository.AuthorRepository;
-import com.panchek.wp.readmore.repository.BookRepository;
-import com.panchek.wp.readmore.repository.SeriesRepository;
+import com.panchek.wp.readmore.repository.*;
 import com.panchek.wp.readmore.service.BookService;
 import com.panchek.wp.readmore.utils.BookComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +30,25 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     SeriesRepository seriesRepository;
+
+    @Autowired
+    GenreRepository genreRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    ReviewRepository reviewRepository;
+
     @Override
-    public List<BookReturn> listBooksByGenre(String genre) {
-        return bookRepository.findAllByGenreEquals(genre).stream().map(book -> mapBookToBR(book))
-                .collect(Collectors.toList());
+    public List<BookReturn> listBooksByGenre(String genreName) {
+        Genre genre=genreRepository.findByName(genreName).orElseThrow(()->new ResourceNotFoundException("Genre","Genre name",genreName));
+        return bookRepository.findAllByGenresContains(genre).stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
     }
 
     @Override
     public List<BookReturn> listBooksBySeries(String seriesName) {
-        Series series=seriesRepository.findByNameEquals(seriesName).orElseThrow(()->new ResourceNotFoundException("Series","Series Name",seriesName));
+        Series series=seriesRepository.findByName(seriesName).orElseThrow(()->new ResourceNotFoundException("Series","Series Name",seriesName));
         return bookRepository.findAllBySeries(series).stream().map(book -> mapBookToBR(book)
         ).collect(Collectors.toList());
     }
@@ -58,12 +68,17 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book createBook(BookCreation bookCreate) {
-        Author author=authorRepository.findByName(bookCreate.getAuthor()).orElse(authorRepository.save(new Author(bookCreate.getAuthor())));
-        Book newBook=new Book(bookCreate.getName(),
-                author,bookCreate.getGenre(),bookCreate.getCover(),
-                bookCreate.getLanguage(),bookCreate.getDownloadList(),
+        Author author=authorRepository.findByName(bookCreate.getAuthor().trim().toLowerCase()).orElse(authorRepository.save(new Author(bookCreate.getAuthor().trim().toLowerCase())));
+        List<Genre> genres=bookCreate.getGenreNames().stream().map(genreName->{
+            return genreRepository.findByName(genreName.trim().toLowerCase()).orElse(genreRepository.save(new Genre(genreName.trim().toLowerCase())));
+        }).collect(Collectors.toList());
+        Series series=seriesRepository.findByName(bookCreate.getSeriesName().trim().toLowerCase()).orElse(seriesRepository.save(new Series(bookCreate.getSeriesName().trim().toLowerCase(),false,author)));
+        Book newBook=new Book(bookCreate.getName().trim().toLowerCase(),
+                author,genres,bookCreate.getCover(),
+                bookCreate.getLanguage().trim().toLowerCase(),bookCreate.getDownloadList(),
                 bookCreate.getShortDescription(),bookCreate.getDatePublished(),
-                bookCreate.getPageCount());
+                bookCreate.getPageCount(),
+                series);
         return bookRepository.save(newBook);
     }
 
@@ -86,7 +101,7 @@ public class BookServiceImpl implements BookService {
         String seriesName="";
         if(b.getSeries()!=null)
             seriesName=b.getSeries().getName();
-        List<Book> booksSameGenre=bookRepository.findAllByGenreEquals(b.getGenre());
+        List<Book> booksSameGenre=bookRepository.findAll();
         booksSameGenre.remove(b.getId());
         Collections.sort(booksSameGenre,new BookComparator(b.getShortDescription(),b.getLanguage(),
                 b.getPopularity(),
@@ -103,6 +118,24 @@ public class BookServiceImpl implements BookService {
         return booksSameGenre.stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
     }
 
+    public Book updatePopularity(Book b) {
+        int likedBy=b.getLikedBy().size();
+        int nmrReviews=b.getReviews().size();
+        int viewCount=b.getViews();
+        double globalRating=bookRepository.getAveragePopularity();
+        return b;
+    }
+
+    public Book updateStarRating(Long id) {
+        Book b=bookRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Book","Id",id));
+        double division=reviewRepository.getSumOfAllRatings(id)/(reviewRepository.countReviewsByBookEquals(b)*1.0);
+        double stars=Math.round(division*2)/2;
+        b.setStarRating(stars);
+        return bookRepository.save(b);
+
+    }
+
+
     public BookReturn mapBookToBR(Book book){
         int reviewSize=0;
         int likedBy=0;
@@ -113,11 +146,12 @@ public class BookServiceImpl implements BookService {
             likedBy=book.getLikedBy().size();
         if(book.getSeries()!=null)
             seriesName=book.getSeries().getName();
+        List<String> genres=book.getGenres().stream().map(genre->genre.getName()).collect(Collectors.toList());
         return new BookReturn(
                 book.getId(),
                 book.getName(),
                 book.getAuthor().getName(),
-                book.getGenre(),
+                genres,
                 book.getCover(),
                 book.getLanguage(),
                 reviewSize,
