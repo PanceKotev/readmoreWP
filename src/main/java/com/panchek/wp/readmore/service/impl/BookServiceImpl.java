@@ -10,6 +10,7 @@ import com.panchek.wp.readmore.payload.BookReturn;
 import com.panchek.wp.readmore.repository.*;
 import com.panchek.wp.readmore.service.BookService;
 import com.panchek.wp.readmore.utils.BookComparator;
+import com.panchek.wp.readmore.utils.PopularityComparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,27 +44,32 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookReturn> listBooksByGenre(String genreName) {
         Genre genre=genreRepository.findByName(genreName).orElseThrow(()->new ResourceNotFoundException("Genre","Genre name",genreName));
-        return bookRepository.findAllByGenresContains(genre).stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
+        List<BookReturn> result=bookRepository.findAllByGenresContains(genre).stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
+        Collections.sort(result,new PopularityComparator());
+        return result;
     }
 
     @Override
     public List<BookReturn> listBooksBySeries(String seriesName) {
         Series series=seriesRepository.findByName(seriesName).orElseThrow(()->new ResourceNotFoundException("Series","Series Name",seriesName));
-        return bookRepository.findAllBySeries(series).stream().map(book -> mapBookToBR(book)
+        List<BookReturn> result=bookRepository.findAllBySeries(series).stream().map(book -> mapBookToBR(book)
         ).collect(Collectors.toList());
+        Collections.sort(result,new PopularityComparator());
+        return result;
     }
 
     @Override
     public List<BookReturn> listBookByAuthor(String authorName) {
         Author author=authorRepository.findByName(authorName).orElseThrow(()->new ResourceNotFoundException("Author","Author Name",authorName));
-        return bookRepository.findAllByAuthorEquals(author).stream().map(book ->mapBookToBR(book))
-                .collect(Collectors.toList());
+       List<BookReturn> result= bookRepository.findAllByAuthorEquals(author).stream().map(book ->mapBookToBR(book)).collect(Collectors.toList());
+       Collections.sort(result,new PopularityComparator());
+       return result;
     }
 
 
     @Override
     public List<BookReturn> listPopularBooks() {
-        return null;
+        return bookRepository.findTop5ByOrderByPopularityDesc().stream().map(book->mapBookToBR(book)).collect(Collectors.toList());
     }
 
     @Override
@@ -91,6 +97,7 @@ public class BookServiceImpl implements BookService {
     public BookReturn findBookByName(String bookName) {
         Book b=bookRepository.findByNameEquals(bookName).orElseThrow(()->new ResourceNotFoundException("Book","Title",bookName));
         b.setViews(b.getViews()+1);
+        b.setPopularity(updatePopularity(b));
         bookRepository.save(b);
         return mapBookToBR(b);
     }
@@ -118,25 +125,17 @@ public class BookServiceImpl implements BookService {
         return booksSameGenre.stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
     }
 
-    public Book updatePopularity(Book b) {
+    public static double updatePopularity(Book b) {
         int likedBy=b.getLikedBy().size();
         int nmrReviews=b.getReviews().size();
         int viewCount=b.getViews();
-        double globalRating=bookRepository.getAveragePopularity();
-        return b;
-    }
-
-    public Book updateStarRating(Long id) {
-        Book b=bookRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Book","Id",id));
-        double division=reviewRepository.getSumOfAllRatings(id)/(reviewRepository.countReviewsByBookEquals(b)*1.0);
-        double stars=Math.round(division*2)/2;
-        b.setStarRating(stars);
-        return bookRepository.save(b);
-
+        double starCount=b.getStarRating();
+        return (0.5*likedBy)+(0.3*nmrReviews)+(0.05*viewCount)+starCount;
     }
 
 
-    public BookReturn mapBookToBR(Book book){
+
+    public static BookReturn mapBookToBR(Book book){
         int reviewSize=0;
         int likedBy=0;
         String seriesName="";

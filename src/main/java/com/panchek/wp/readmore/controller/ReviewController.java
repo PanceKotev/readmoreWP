@@ -3,6 +3,7 @@ package com.panchek.wp.readmore.controller;
 import com.panchek.wp.readmore.model.Book;
 import com.panchek.wp.readmore.model.Review;
 import com.panchek.wp.readmore.payload.ApiResponse;
+import com.panchek.wp.readmore.payload.ReviewEditRequest;
 import com.panchek.wp.readmore.payload.ReviewRequest;
 import com.panchek.wp.readmore.payload.ReviewResponse;
 import com.panchek.wp.readmore.security.CurrentUser;
@@ -29,14 +30,17 @@ public class ReviewController {
     public List<ReviewResponse> findReviewsByUser(@PathVariable(value = "userId")Long userId){
         return reviewService.listReviewsByUser(userId);
     }
+
     @GetMapping("/me")
     public List<ReviewResponse> findReviewsByUser(@CurrentUser UserPrincipal currentUser){
         return reviewService.listReviewsByMe(currentUser);
     }
+
     @GetMapping("/book/{bookId}")
     public List<ReviewResponse> findReviewsByBook(@PathVariable(value="bookId") Long bookId){
         return reviewService.listReviewsByBook(bookId);
     }
+
     @PostMapping("/create")
     public ResponseEntity<?> createReview(@CurrentUser UserPrincipal currentUser, @Valid @RequestBody ReviewRequest reviewRequest){
         if(reviewService.existsByUserIdAndBookId(currentUser.getId(),reviewRequest.getBookId())){
@@ -49,8 +53,21 @@ public class ReviewController {
                 .buildAndExpand(result.getId()).toUri();
         return ResponseEntity.created(location).body(new ApiResponse(true, "Review created successfully!"));
     }
+
     @GetMapping("/{reviewId}")
     public ReviewResponse returnReview(@PathVariable(value = "reviewId")Long reviewId){
         return reviewService.getReviewById(reviewId);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable(value="reviewId") Long reviewId){
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.ok(new ApiResponse(true,"Review deleted successfully!"));
+    }
+
+    @PatchMapping("/edit")
+    public ResponseEntity<?> updateReview(@CurrentUser UserPrincipal userPrincipal, @Valid @RequestBody ReviewEditRequest reviewEditRequest){
+        reviewService.updateReview(userPrincipal,reviewEditRequest);
+        return ResponseEntity.ok(new ApiResponse(true,"Review edited successfully!"));
     }
 }

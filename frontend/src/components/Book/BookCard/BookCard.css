@@ -1,0 +1,8 @@
+.bookCard-body{
+    background-color: #ffebd9;
+    opacity:1;
+    height:60vh;
+    border-right: 0.7em solid #d8bea7;
+    border-bottom: 0.7em solid #d8bea7;
+    border-top: 0.1em solid #d8bea7;
+}

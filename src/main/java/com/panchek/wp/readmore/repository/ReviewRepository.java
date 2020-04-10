@@ -22,4 +22,5 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     @Query("select case when count(r)> 0 then true else false end from Review r where r.user.id = :userId and r.book.id = :bookId ")
     boolean existsByUserIdAndBookId(Long userId,Long bookId);
 
+    void deleteById(Long reviewId);
 }

@@ -1,8 +1,11 @@
 package com.panchek.wp.readmore.repository;
 
 import com.panchek.wp.readmore.model.Book;
+import com.panchek.wp.readmore.model.Role;
+import com.panchek.wp.readmore.model.RoleName;
 import com.panchek.wp.readmore.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +20,5 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
     int countUsersByLikedBooksContaining(Book b);
+    boolean existsByIdEqualsAndRolesContains(Long id, Role role);
 }

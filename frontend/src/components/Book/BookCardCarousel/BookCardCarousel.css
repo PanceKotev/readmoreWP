@@ -1,0 +1,17 @@
+.carousel-control-prev-icon {
+    filter:invert();
+}
+
+.carousel-control-next-icon {
+   filter:invert();
+}
+.carousel-inner{
+    height:100%;
+}
+.parent{
+    min-height:50vh;
+}
+.carousel{
+    padding:3%;
+    width:100%;
+}

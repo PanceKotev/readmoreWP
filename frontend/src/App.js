@@ -1,17 +1,86 @@
-import React from 'react';
-import logo from './logo.svg';
-import {DatePicker} from "antd"
-import "antd/dist/antd.css"
-import './App.css';
+import React, { Component } from 'react';
+import {BrowserRouter as Router, Route, Redirect} from 'react-router-dom'
+import Auth from "./service/authService"
+import {ACCESS_TOKEN} from "./constants/index"
+import {toast, ToastContainer, ToastPosition} from 'react-toastify'
+import Header from "./components/Header/Header"
+import bg2 from "./Images/bg2.jpeg"
+import Login from "./components/User/Login/Login"
+import Books from "./components/Book/Books/Books"
+import Register from "./components/User/Register/Register"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <DatePicker format="DD/MM/YYYY"/>
-      </header>
-    </div>
-  );
+class App extends Component {
+  
+  constructor(props){
+    toast.configure({position:ToastPosition.TOP_CENTER,autoClose:3000});
+    super(props);
+    this.state={
+      currentUser: null,
+      isAuthenticated: false,
+      isLoading: false
+    }
+    this.handleLogout = this.handleLogout.bind(this);
+    this.loadCurrentUser = this.loadCurrentUser.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    
+
+  }
+  loadCurrentUser = () => {
+    this.setState({
+        isLoading: true
+    });
+    Auth.getCurrentUser()
+        .then(response => {
+            this.setState({
+                currentUser: response.data,
+                isAuthenticated: true,
+                isLoading: false
+            });
+        }).catch(error => {
+        this.setState({
+            isLoading: false
+        });
+    });
+  };
+  handleLogin = (request) => {
+    toast.success("You're successfully logged in.")
+    this.loadCurrentUser();
+  };
+  handleLogout = (redirectTo="/") => {
+    localStorage.removeItem(ACCESS_TOKEN);
+    toast.success("You've successfully logged out.")
+    this.setState({
+        currentUser: null,
+        isAuthenticated: false
+    });
+  };
+
+  componentDidMount(){
+    this.loadCurrentUser();
+  }
+
+  render() {
+    return (
+      <Router>
+        <div className="App" style={  {minHeight:'100vh', width:'100%',padding:'0',background: "url("+bg2+")",
+          backgroundPosition: 'center center',backgroundSize: 'cover',backgroundAttachment: 'fixed'}}>
+          <Header isAuthenticated={this.state.isAuthenticated} currentUser={this.state.currentUser} onLogout={this.handleLogout}/>
+          
+          <div className="container">
+            <Route path={"/signin"} exact>
+              <Login onLogin={this.handleLogin} getUser={this.loadCurrentUser}/>
+            </Route>
+            <Route path={"/signup"} exact>
+              <Register></Register>
+            </Route>
+            <Route path={"/"} exact ><Books/>
+              </Route>
+            <Redirect to={"/"}></Redirect>
+          </div>
+        </div>
+        </Router>
+    );
+  }
 }
 
 export default App;

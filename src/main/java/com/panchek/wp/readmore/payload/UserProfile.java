@@ -10,14 +10,16 @@ public class UserProfile {
     private String username;
     private String name;
     private Instant joinedAt;
-    private List<Book> likedBooks;
+    private List<BookReturn> likedBooks;
+    private List<ReviewResponse> reviews;
 
-    public UserProfile(Long id, String username, String name, Instant joinedAt,List<Book> likedBooks) {
+    public UserProfile(Long id, String username, String name, Instant joinedAt,List<BookReturn> likedBooks,List<ReviewResponse> reviews) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.joinedAt = joinedAt;
         this.likedBooks = likedBooks;
+        this.reviews=reviews;
     }
 
     public Long getId() {
@@ -52,11 +54,19 @@ public class UserProfile {
         this.joinedAt = joinedAt;
     }
 
-    public List<Book> getLikedBooks() {
+    public List<BookReturn> getLikedBooks() {
         return likedBooks;
     }
 
-    public void setLikedBooks(List<Book> likedBooks) {
+    public void setLikedBooks(List<BookReturn> likedBooks) {
         this.likedBooks = likedBooks;
+    }
+
+    public List<ReviewResponse> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<ReviewResponse> reviews) {
+        this.reviews = reviews;
     }
 }

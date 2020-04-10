@@ -1,22 +1,19 @@
-import apiUtils from "../util/apiUtils";
+import apiUtils from "../utils/apiUtils";
 import {ACCESS_TOKEN} from "../constants";
 
 
 const Auth = {
     login: (request) => {
-        return apiUtils.post('/auth/login', request);
+        return apiUtils.post('/auth/signin', request);
     },
-    registerAdmin: (request) => {
-        return  apiUtils.post('/auth/register-admin', request);
-    },
-    registerManager: (request) => {
-        return  apiUtils.post('/auth/register-manager', request);
+    register: (request) => {
+        return  apiUtils.post('/auth/signup', request);
     },
     getCurrentUser: () => {
         if(!localStorage.getItem(ACCESS_TOKEN)) {
             return Promise.reject("No access token set.");
         }
-        return apiUtils.get('/users/me')
+        return apiUtils.get('/user/me')
     }
 };
 

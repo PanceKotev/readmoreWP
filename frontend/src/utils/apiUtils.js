@@ -11,7 +11,6 @@ const apiUtils = {
     },
     post: (url, body) => {
         const data = JSON.stringify(body);
-
         return axios.post(url, data, {
             headers: {
                 Authorization: token(),

@@ -46,6 +46,11 @@ public class BookController {
         return bookService.findBookByName(bookName.trim().toLowerCase());
     }
 
+    @GetMapping("/popular")
+    public List<BookReturn> getPopularBooks(){
+        return bookService.listPopularBooks();
+    }
+
     @GetMapping("/author/{authorName}")
     public List<BookReturn> getBooksByAuthor(@PathVariable(value="authorName")String authorName){
         return bookService.listBookByAuthor(authorName.trim().toLowerCase());
