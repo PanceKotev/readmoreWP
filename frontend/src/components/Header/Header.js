@@ -6,6 +6,9 @@ const Header = (props) => {
         props.history.push('/');
         props.onLogout();
     };
+    const genres=props.genreNames.map((genre,index)=>{
+        return (<Link to={"/genre/"+genre} key={index} className="nav-link text-dark">{genre.toString().charAt(0).toUpperCase()+genre.toString().slice(1)}</Link>);
+    });
     let menuItems=[]
     
         if(props.currentUser){
@@ -16,9 +19,9 @@ const Header = (props) => {
             {props.currentUser.username}
             </span>
         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-         <Link to={"users/me"} className="nav-link text-dark">Profile</Link>
-         <Link to={"users/likedBooks"} className="nav-link text-dark">Liked books</Link>
-         <Link to={"users/reviews"} className="nav-link text-dark">Reviews</Link>
+         <Link to={"/users/"+props.currentUser.username+""} className="nav-link text-dark">Profile</Link>
+         <Link to={"/users/likedBooks"} className="nav-link text-dark">Liked books</Link>
+         <Link to={"/users/reviews"} className="nav-link text-dark">Reviews</Link>
           <div className="dropdown-divider"></div>
           <Link to={"#"} className="nav-link text-dark" onClick={handleLogout}>Logout</Link>
         </div>
@@ -50,8 +53,14 @@ const Header = (props) => {
 
   <div className="collapse navbar-collapse" id="navbarSupportedContent">
     <ul className="navbar-nav mr-auto">
-      <li className="nav-item active">
-        <Link to={"/"} className="nav-link text-brown">Genres <span className="sr-only">(current)</span></Link>
+      <li className="nav-item dropdown" >
+            <span className="nav-link dropdown-toggle d-block text-brown" href="#" id="genreDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Genres
+            </span>
+        <div className="dropdown-menu" aria-labelledby="genreDropdown">
+          {genres}
+
+        </div>
       </li>
     </ul>
         {menuItems}

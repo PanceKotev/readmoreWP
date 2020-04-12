@@ -10,7 +10,7 @@ const BookCardCarousel = (props) => {
       }
       else
         classNm="carousel-item"
-      return (<div className={classNm.toString()}><div className="parent d-flex justify-content-center"><BookCard key={index} name={book.name} description={book.shortDescription} id={book.id} 
+      return (<div className={classNm.toString()}><div className="parent d-flex justify-content-center"><BookCard handleLike={props.handleLike} handleUnlike={props.handleUnlike} liked={book.liked} authenticated={props.authenticated} key={index} name={book.name} description={book.shortDescription} id={book.id} 
       author={book.authorName} cover={book.cover} genres={book.genreNames} stars={book.starRating} likes={book.nmbrLikes}/></div></div>)
     });
       let indicators=[];

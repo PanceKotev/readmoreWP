@@ -35,7 +35,9 @@ public class BookReturn {
 
     private double popularity;
 
-    public BookReturn(Long id, String name, String authorName, List<String> genreNames, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, LocalDate datePublished, double starRating, double popularity) {
+    private boolean liked;
+
+    public BookReturn(Long id, String name, String authorName, List<String> genreNames, String cover, String language, int nmbrReviews, int nmbrLikes, String downloadList, String shortDescription, String seriesName, LocalDate datePublished, double starRating, double popularity,boolean liked) {
         this.id = id;
         this.name = name;
         this.authorName = authorName;
@@ -50,6 +52,7 @@ public class BookReturn {
         this.datePublished = datePublished;
         this.starRating = starRating;
         this.popularity = popularity;
+        this.liked=liked;
     }
 
     public Long getId() {
@@ -164,5 +167,13 @@ public class BookReturn {
 
     public void setGenreNames(List<String> genreNames) {
         this.genreNames = genreNames;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 }

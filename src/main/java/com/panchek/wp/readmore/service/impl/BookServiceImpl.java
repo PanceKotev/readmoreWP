@@ -1,13 +1,11 @@
 package com.panchek.wp.readmore.service.impl;
 
 import com.panchek.wp.readmore.exception.ResourceNotFoundException;
-import com.panchek.wp.readmore.model.Author;
-import com.panchek.wp.readmore.model.Book;
-import com.panchek.wp.readmore.model.Genre;
-import com.panchek.wp.readmore.model.Series;
+import com.panchek.wp.readmore.model.*;
 import com.panchek.wp.readmore.payload.BookCreation;
 import com.panchek.wp.readmore.payload.BookReturn;
 import com.panchek.wp.readmore.repository.*;
+import com.panchek.wp.readmore.security.UserPrincipal;
 import com.panchek.wp.readmore.service.BookService;
 import com.panchek.wp.readmore.utils.BookComparator;
 import com.panchek.wp.readmore.utils.PopularityComparator;
@@ -42,43 +40,67 @@ public class BookServiceImpl implements BookService {
     ReviewRepository reviewRepository;
 
     @Override
-    public List<BookReturn> listBooksByGenre(String genreName) {
-        Genre genre=genreRepository.findByName(genreName).orElseThrow(()->new ResourceNotFoundException("Genre","Genre name",genreName));
-        List<BookReturn> result=bookRepository.findAllByGenresContains(genre).stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
+    public List<BookReturn> listBooksByGenre(UserPrincipal currentUser,String genreName) {
+        Genre genre=genreRepository.findByNameEquals(genreName).orElseThrow(()->new ResourceNotFoundException("Genre","Genre name",genreName));
+        List<BookReturn> result=bookRepository.findAllByGenresContains(genre).stream().map(book -> {
+            boolean likedBy=false;
+            if(currentUser!=null){
+               likedBy = bookRepository.bookLikedBy(currentUser.getId(),book.getId());
+            }
+           return mapBookToBR(book,likedBy);}).collect(Collectors.toList());
         Collections.sort(result,new PopularityComparator());
         return result;
     }
 
     @Override
-    public List<BookReturn> listBooksBySeries(String seriesName) {
-        Series series=seriesRepository.findByName(seriesName).orElseThrow(()->new ResourceNotFoundException("Series","Series Name",seriesName));
-        List<BookReturn> result=bookRepository.findAllBySeries(series).stream().map(book -> mapBookToBR(book)
+    public List<BookReturn> listBooksBySeries(UserPrincipal currentUser, String seriesName) {
+        Series series=seriesRepository.findByNameEquals(seriesName).orElseThrow(()->new ResourceNotFoundException("Series","Series Name",seriesName));
+        List<BookReturn> result=bookRepository.findAllBySeries(series).stream().map(book -> {
+            boolean likedBy=false;
+            if(currentUser!=null){
+                likedBy = bookRepository.bookLikedBy(currentUser.getId(),book.getId());
+            }
+            return mapBookToBR(book,likedBy);}
         ).collect(Collectors.toList());
         Collections.sort(result,new PopularityComparator());
         return result;
     }
 
     @Override
-    public List<BookReturn> listBookByAuthor(String authorName) {
-        Author author=authorRepository.findByName(authorName).orElseThrow(()->new ResourceNotFoundException("Author","Author Name",authorName));
-       List<BookReturn> result= bookRepository.findAllByAuthorEquals(author).stream().map(book ->mapBookToBR(book)).collect(Collectors.toList());
+    public List<BookReturn> listBookByAuthor(UserPrincipal currentUser,String authorName) {
+        Author author=authorRepository.findByNameEquals(authorName).orElseThrow(()->new ResourceNotFoundException("Author","Author Name",authorName));
+       List<BookReturn> result= bookRepository.findAllByAuthorEquals(author).stream().map(book -> {
+           boolean likedBy=false;
+           if(currentUser!=null){
+               likedBy = bookRepository.bookLikedBy(currentUser.getId(),book.getId());
+           }
+           return mapBookToBR(book,likedBy);}).collect(Collectors.toList());
        Collections.sort(result,new PopularityComparator());
        return result;
     }
 
 
     @Override
-    public List<BookReturn> listPopularBooks() {
-        return bookRepository.findTop5ByOrderByPopularityDesc().stream().map(book->mapBookToBR(book)).collect(Collectors.toList());
+    public List<BookReturn> listPopularBooks(UserPrincipal currentUser) {
+        return bookRepository.findTop5ByOrderByPopularityDesc().stream().map(book-> {
+            boolean likedBy=false;
+            if(currentUser!=null){
+                likedBy = bookRepository.bookLikedBy(currentUser.getId(),book.getId());
+            }
+            return mapBookToBR(book,likedBy);}).collect(Collectors.toList());
     }
 
     @Override
     public Book createBook(BookCreation bookCreate) {
-        Author author=authorRepository.findByName(bookCreate.getAuthor().trim().toLowerCase()).orElse(authorRepository.save(new Author(bookCreate.getAuthor().trim().toLowerCase())));
+        Author author=authorRepository.findByNameEquals(bookCreate.getAuthor().trim().toLowerCase()).orElseGet(()->authorRepository.save(new Author(bookCreate.getAuthor().trim().toLowerCase())));
         List<Genre> genres=bookCreate.getGenreNames().stream().map(genreName->{
-            return genreRepository.findByName(genreName.trim().toLowerCase()).orElse(genreRepository.save(new Genre(genreName.trim().toLowerCase())));
+            return genreRepository.findByNameEquals(genreName.trim().toLowerCase()).orElseGet(()->genreRepository.save(new Genre(genreName.trim().toLowerCase())));
         }).collect(Collectors.toList());
-        Series series=seriesRepository.findByName(bookCreate.getSeriesName().trim().toLowerCase()).orElse(seriesRepository.save(new Series(bookCreate.getSeriesName().trim().toLowerCase(),false,author)));
+        Series series = null;
+        if(bookCreate.getSeriesName()!="") {
+             series = seriesRepository.findByNameEquals(bookCreate.getSeriesName().trim().toLowerCase()).orElseGet(() -> seriesRepository.save(new Series(bookCreate.getSeriesName().trim().toLowerCase(), false, author)));
+        }
+
         Book newBook=new Book(bookCreate.getName().trim().toLowerCase(),
                 author,genres,bookCreate.getCover(),
                 bookCreate.getLanguage().trim().toLowerCase(),bookCreate.getDownloadList(),
@@ -94,12 +116,16 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookReturn findBookByName(String bookName) {
+    public BookReturn findBookByName(UserPrincipal currentUser,String bookName) {
         Book b=bookRepository.findByNameEquals(bookName).orElseThrow(()->new ResourceNotFoundException("Book","Title",bookName));
         b.setViews(b.getViews()+1);
         b.setPopularity(updatePopularity(b));
+            boolean likedBy=false;
+            if(currentUser!=null){
+                likedBy = bookRepository.bookLikedBy(currentUser.getId(),b.getId());
+            }
         bookRepository.save(b);
-        return mapBookToBR(b);
+        return mapBookToBR(b,likedBy);
     }
 
     @Override
@@ -122,8 +148,9 @@ public class BookServiceImpl implements BookService {
         if(booksSameGenre.size()<=5)
             lastIndex=booksSameGenre.size()-1;
         booksSameGenre.subList(0,lastIndex);
-        return booksSameGenre.stream().map(book -> mapBookToBR(book)).collect(Collectors.toList());
+        return booksSameGenre.stream().map(book -> mapBookToBR(book,false)).collect(Collectors.toList());
     }
+
 
     public static double updatePopularity(Book b) {
         int likedBy=b.getLikedBy().size();
@@ -135,7 +162,7 @@ public class BookServiceImpl implements BookService {
 
 
 
-    public static BookReturn mapBookToBR(Book book){
+    public static BookReturn mapBookToBR(Book book,boolean liked){
         int reviewSize=0;
         int likedBy=0;
         String seriesName="";
@@ -160,6 +187,7 @@ public class BookServiceImpl implements BookService {
                 seriesName,
                 book.getDatePublished(),
                 book.getStarRating(),
-                book.getPopularity());
+                book.getPopularity(),
+                liked);
     }
 }

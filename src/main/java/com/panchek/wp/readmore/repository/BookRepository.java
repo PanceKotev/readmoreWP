@@ -39,4 +39,7 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     @Query("select avg(b.popularity) from Book b")
     double getAveragePopularity();
 
+    @Query("select case when count(distinct b)> 0 then true else false end from Book b join b.likedBy user where user.id=:userId and b.id=:bookId ")
+    boolean bookLikedBy(Long userId,Long bookId);
+
 }

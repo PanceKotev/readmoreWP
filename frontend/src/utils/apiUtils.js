@@ -1,5 +1,6 @@
 import { ACCESS_TOKEN} from '../constants';
 import axios from "../custom-axios/axios";
+import jwt from 'jsonwebtoken'
 
 const apiUtils = {
     get: (url) => {
@@ -22,9 +23,19 @@ const apiUtils = {
 
 function token() {
     if(localStorage.getItem(ACCESS_TOKEN)) {
-        return 'Bearer ' + localStorage.getItem(ACCESS_TOKEN);
+        let token=localStorage.getItem(ACCESS_TOKEN);
+        if(isExpired(token)){
+            localStorage.removeItem(ACCESS_TOKEN);
+            return '';
+        }
+        return 'Bearer ' + token;
     }
     return '';
 }
 
+function isExpired(token){
+    var decodedToken=jwt.decode(token, {complete: true});
+    var dateNow = new Date();
+    return decodedToken.exp < dateNow.getTime();
+}
 export default apiUtils;

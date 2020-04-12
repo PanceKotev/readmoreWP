@@ -4,6 +4,8 @@ import com.panchek.wp.readmore.model.Book;
 import com.panchek.wp.readmore.payload.ApiResponse;
 import com.panchek.wp.readmore.payload.BookCreation;
 import com.panchek.wp.readmore.payload.BookReturn;
+import com.panchek.wp.readmore.security.CurrentUser;
+import com.panchek.wp.readmore.security.UserPrincipal;
 import com.panchek.wp.readmore.service.impl.BookServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,8 @@ public class BookController {
         BookServiceImpl bookService;
 
     @GetMapping("/genre/{genre}")
-    public List<BookReturn> getBooksByGenre(@PathVariable(value="genre") String genre){
-        return bookService.listBooksByGenre(genre.trim().toLowerCase());
+    public List<BookReturn> getBooksByGenre(@CurrentUser UserPrincipal currentUser, @PathVariable(value="genre") String genre){
+        return bookService.listBooksByGenre(currentUser, genre.trim().toLowerCase());
     }
 
     @PostMapping("/create")
@@ -42,23 +44,23 @@ public class BookController {
     }
 
     @GetMapping("/")
-    public BookReturn getBook(@RequestParam String bookName){
-        return bookService.findBookByName(bookName.trim().toLowerCase());
+    public BookReturn getBook(@CurrentUser UserPrincipal currentUser, @RequestParam String bookName){
+        return bookService.findBookByName(currentUser, bookName.trim().toLowerCase());
     }
 
     @GetMapping("/popular")
-    public List<BookReturn> getPopularBooks(){
-        return bookService.listPopularBooks();
+    public List<BookReturn> getPopularBooks(@CurrentUser UserPrincipal currentUser){
+        return bookService.listPopularBooks(currentUser);
     }
 
     @GetMapping("/author/{authorName}")
-    public List<BookReturn> getBooksByAuthor(@PathVariable(value="authorName")String authorName){
-        return bookService.listBookByAuthor(authorName.trim().toLowerCase());
+    public List<BookReturn> getBooksByAuthor(@CurrentUser UserPrincipal currentUser, @PathVariable(value="authorName")String authorName){
+        return bookService.listBookByAuthor(currentUser, authorName.trim().toLowerCase());
     }
 
     @GetMapping("/series/{seriesName}")
-    public List<BookReturn> getBooksBySeries(@PathVariable(value="seriesName")String seriesName){
-        return bookService.listBooksBySeries(seriesName.trim().toLowerCase());
+    public List<BookReturn> getBooksBySeries(@CurrentUser UserPrincipal currentUser, @PathVariable(value="seriesName")String seriesName){
+        return bookService.listBooksBySeries(currentUser, seriesName.trim().toLowerCase());
     }
 
 
