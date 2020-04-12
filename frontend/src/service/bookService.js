@@ -13,6 +13,9 @@ const BS = {
     },
     listBooksByAuthor:(authorName)=>{
         return apiUtils.get("/book/author/"+authorName);
+    },
+    listBooksBySeries:(seriesName)=>{
+        return apiUtils.get("/book/series/"+seriesName);
     }
 }
 export default BS;

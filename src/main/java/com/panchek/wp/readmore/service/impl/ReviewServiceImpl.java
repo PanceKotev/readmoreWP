@@ -46,8 +46,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewResponse> listReviewsByBook(Long bookId) {
-        Book book=bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Book","Book id",bookId));
+    public List<ReviewResponse> listReviewsByBook(String bookName) {
+        Book book=bookRepository.findByNameEquals(bookName).orElseThrow(()->new ResourceNotFoundException("Book","Book name",bookName));
         return reviewRepository.findAllByBook(book).stream().map(review -> mapReviewToRR(review)).collect(Collectors.toList());
     }
 

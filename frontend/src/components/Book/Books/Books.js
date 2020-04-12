@@ -16,7 +16,6 @@ class Books extends Component {
 
         this.state={
             books:[],
-            book:[],
             notFound:false,
             serverError:false,
             isLoading:false
@@ -37,8 +36,8 @@ class Books extends Component {
                     isLoading:false
                 })
             }).catch(error=>{
-
-                if(error.status === 404){
+                let code=error.message.slice(error.message.length-3).trim();
+                if(code === '404'){
                     this.setState({
                         isLoading:false,
                         notFound:true
@@ -53,18 +52,26 @@ class Books extends Component {
             })
             break;
         }
-        case "details":{
-            BS.getBook(this.props.match.params.bookName).then((data)=>{
-                console.log(data);
+        case "series":{
+            BS.listBooksBySeries(this.props.match.params.seriesName).then((data)=>{
                 this.setState({
-                    isLoading:false,
-                    book:data.data
-                });
-            }).catch(error=>{
-                    console.log(error);
-                this.setState({
+                    books:data.data,
                     isLoading:false
                 })
+            }).catch(error=>{
+                let code=error.message.slice(error.message.length-3).trim();
+                if(code === '404'){
+                    this.setState({
+                        isLoading:false,
+                        notFound:true
+                    })
+                }
+                else{
+                    this.setState({
+                        isLoading:false,
+                        serverError:true
+                    })
+                }
             })
             break;
         }
@@ -161,8 +168,8 @@ class Books extends Component {
             this.loadBooks("genre");
         }else if(this.props.listTypeBy === "author" && (this.props.match.params.authorName !== nextProps.match.params.authorName)){
             this.loadBooks("author");
-        }else if(this.props.listTypeBy === "details" && (this.props.match.params.bookName !== nextProps.match.params.bookName)){
-            this.loadBooks("details");
+        }else if(this.props.listTypeBy === "series" && (this.props.match.params.seriesName !== nextProps.match.params.seriesName)){
+            this.loadBooks("series");
         }
     }
     render() {
@@ -187,10 +194,11 @@ class Books extends Component {
                 <div className="d-block mx-auto text-center w-100"><div className="heading-t">Books from the genre <b>{this.props.match.params.genreName.toString().charAt(0).toUpperCase()+this.props.match.params.genreName.toString().slice(1)}</b></div></div>
                 <BookList handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
         }
-        if(this.props.listTypeBy === "details"){
-              return  (<BookDetails handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated}
-                  book={this.state.book}
-              />)
+        if(this.props.listTypeBy === "series"){
+            return (
+                <div className="row row-cols-1">
+                <div className="d-block mx-auto text-center w-100"><div className="heading-t">Books from the series <b>{this.props.match.params.seriesName.toString().charAt(0).toUpperCase()+this.props.match.params.seriesName.toString().slice(1)}</b></div></div>
+                <BookList handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
         }
         return (
                 <BookCardCarousel authenticated={this.props.authenticated} handleLike={this.handleLike} handleUnlike={this.handleUnlike} books={this.state.books} />

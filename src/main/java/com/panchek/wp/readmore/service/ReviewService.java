@@ -14,7 +14,7 @@ public interface ReviewService {
 
     List<ReviewResponse> listReviewsByMe(UserPrincipal currentUser);
 
-    List<ReviewResponse> listReviewsByBook(Long bookId);
+    List<ReviewResponse> listReviewsByBook(String bookName);
 
     Review createReview(UserPrincipal currentUser,ReviewRequest create);
 

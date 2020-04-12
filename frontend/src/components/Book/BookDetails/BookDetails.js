@@ -1,30 +1,166 @@
-import React from 'react';
+import React, { Component } from 'react';
+import {Link, withRouter, Redirect} from 'react-router-dom';
+import Rating from 'react-rating';
+import BS from '../../../service/bookService';
+import NotFound from '../../common/NotFound/NotFound';
+import ServerError from '../../common/ServerError/ServerError';
+import LoadingIndicator from '../../common/LoadingIndicator/LoadingIndicator';
+import UServ from '../../../service/userService';
+import ReviewList from '../../Review/ReviewList/ReviewList';
+import RS from '../../../service/reviewService'
+import BR from '../../../service/bookReviewService'
+import ReviewAdd from '../../Review/ReviewAdd/ReviewAdd';
 
-const BookDetails = (props) => {
-   let series=[];
-   if(props.book.seriesName!==null){
-        series= <div className="text-muted">{props.book.seriesName}</div>
-    }else series=<div className="text-muted">go from</div>
-    return (
-        <div className="d-flex w-100 row mt-5 mx-auto">
+class BookDetails extends Component {
+    constructor(props){
+        super(props);
+        this.state={
+            book:[],
+            isLoading:false,
+            notFound:false,
+            serverError:false,
+            reviews:[],
+            tokenExpired:false
+        }
+        this.loadBook=this.loadBook.bind(this);
+        this.bookUnlike=this.bookUnlike.bind(this);
+        this.bookLike=this.bookLike.bind(this);
+        this.getUsername=this.getUsername.bind(this);
+    }
+    loadBook(bookName){
+        this.setState({
+            isLoading:true
+        });
+        BR.getBookAndReviews(bookName).then((data)=>{
+            this.setState({
+                book:data[0].data,
+                reviews:data[1].data,
+                isLoading:false
+            })
+
+        }).catch(error=>{
+            console.log(error);
+            let code=error.message.slice(error.message.length-3).trim();
+            if(code === '404') {
+                this.setState({
+                    isLoading:false,
+                    notFound: true,
+                });
+            } else if(code === '401') {
+                this.setState({
+                    isLoading:false,
+                    tokenExpired: true,
+                }); }   
+            else {
+                this.setState({
+                    isLoading:false,
+                    serverError: true,
+                });      
+            }  
+        });
+    }
+    bookLike(){
+        UServ.likeBook(this.state.book.id).then((data)=>{
+            this.setState({
+                book:data.data
+            })
+        }).catch(error=>{
+            console.log(error);
+        })
+    }
+    bookUnlike(){
+        UServ.unlikeBook(this.state.book.id).then((data)=>{
+            this.setState({
+                book:data.data
+            })
+        }).catch(error=>{
+            console.log(error);
+        })
+    }
+    componentDidMount(){
+        let bookName=this.props.match.params.bookName;
+        this.loadBook(bookName);
+    }
+    componentDidUpdate(nextProps){
+        if(this.props.match.params.bookName!==nextProps.match.params.bookName){
+            this.loadBook(nextProps.match.params.bookName);
+        }
+    }
+    getUsername(){
+        if(this.props.match.params.user1){
+            console.log("yeee")
+            return this.props.match.params.user1.username;
+        
+        }
+        return "";
+    }
+    render() {
+        if(this.state.tokenExpired){
+           return <Redirect to={"/signin"}/>
+        }
+        if(this.state.isLoading){
+            return <LoadingIndicator/>
+        }
+        if(this.state.notFound){
+            return <NotFound/>
+        }
+        if (this.state.serverError){
+            return <ServerError/>
+        }
+        let genres=[];
+        if(this.state.book.genreNames){
+         genres= this.state.book.genreNames.map((genre,index)=>{
+             if(index===this.state.book.genreNames.length-1){
+            return (<Link className="pl-1 ml-1 mb-1" style={{color:'#212529'}} to={"/genre/"+genre}>{genre}</Link>);}
+            else {
+                return (<Link className="pl-1 ml-1 mb-1" style={{color:'#212529'}} to={"/genre/"+genre}>{genre+','}</Link>);
+            }
+        });}
+        let series=[];
+        if(this.state.book.seriesName!==""){
+           
+            series.push(<Link to={"/series/"+this.state.book.seriesName} className="" style={{color:'#212529'}}><i>{this.state.book.seriesName}</i></Link>);
+        }
+        let likes=[];
+        if(this.state.book.liked===true){
+            likes=<div className="" onClick={this.bookUnlike} style={{color:'green',cursor:'pointer'}}><i class="fa fa-check"></i> Liked</div>
+        }else{
+            likes=<div className="" onClick={this.bookLike} style={{color:'red',cursor:'pointer'}}><i class="fa fa-times"></i> Liked</div>
+        }
+        return (
+            <div className="d-block">
+            <div className="d-flex w-100 row mt-5 mx-auto col-12">
             <div className="col-3">
-                <img src={props.book.cover} className="img-fluid w-100 h-100" alt={props.book.name}/>
-                <span className="text-muted">{props.book.datePublished}</span>
-                <div className="">Like</div>
-                <div className="">Review</div>
+                <img src={this.state.book.cover} className="img-fluid w-100 h-100" alt={this.state.book.name}/>
+                
+                <span className="text-muted">{this.state.book.datePublished}</span>
+                <div className="">{likes}</div>
             </div>
             <div className="col-7">
-                <h3>{props.book.name}</h3>
-                <span className="text-muted">by {props.book.authorName}</span>
-                <div className="ratings d-flex"></div>
-                <p className="">{props.book.shortDescription}</p>
+                <h3>{this.state.book.name}</h3>
+                <div className="">{series}</div>
+                <span className="text-muted">by {this.state.book.authorName}</span>
+                <div className="ratings d-flex">
+                    <div className="col pl-0 "><Rating style={{ fontSize:'0.6vw',color:'#212529'}} readonly initialRating={this.state.book.starRating} emptySymbol="fa fa-star-o fa-2x" fullSymbol="fa fa-star fa-2x" fractions={2}/></div>
+                    <div className="col"><i>likes : {this.state.book.nmbrLikes}</i></div>
+                    <div className="col"><i>reviews : {this.state.book.nmbrReviews}</i></div>
+                    <div className="col"></div>
+                    <div className="col"></div>
+                </div>
+                <p className="">{this.state.book.shortDescription}</p>
                 <hr/>
-                <div className="genres d-flex">{props.book.genreNames}</div>
-                {series}
-                <a href={props.book.downloadList} type="button" className="btn btn-sm btn-light">Download</a>
+                <div className="genres d-flex">{genres}</div>
+                <a href={this.state.book.downloadList} type="button" className="btn btn-sm btn-light">Download</a>
             </div>
         </div>
-    );
-};
+        <hr/>
+        <div className="bookReviews d-block mt-5">
+           {/*<ReviewAdd userName={this.getUsername()} bookName={this.state.book.name}/> */}
+            <ReviewList reviews={this.state.reviews}/>
+        </div>
+        </div>
+        );
+    }
+}
 
-export default BookDetails;
+export default withRouter(BookDetails);

@@ -18,7 +18,15 @@ const apiUtils = {
                 'content-type': 'application/json'
             }
         });
+    },
+    delete: (url) =>{
+        return axios.delete(url,{
+            headers:{
+                Authorization: token()
+            }
+        });
     }
+    
 };
 
 function token() {

@@ -74,7 +74,6 @@ class App extends Component {
     this.loadGenreNames();
    
   }
-
   render() {
     if(this.state.isLoading){
       return <LoadingIndicator/>
@@ -100,7 +99,8 @@ class App extends Component {
               </Route>
             <Route path={"/genre/:genreName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="genre" {...props} />} />
             <Route path={"/author/:authorName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="author" {...props} />} />
-            <Route path={"/book/:bookName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="details" {...props}/>}/>
+            <Route path={"/series/:seriesName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="series" {...props} />} />
+            <PrivateRoute exact path={"/book/:bookName"} user1={this.state.currentUser} authenticated={this.state.isAuthenticated} component={BookDetails}/>
             <PrivateRoute exact path="/users/:username" authenticated={this.state.isAuthenticated} component={Profile}/>
           </div>
         </div>

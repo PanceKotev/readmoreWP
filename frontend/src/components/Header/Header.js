@@ -20,8 +20,6 @@ const Header = (props) => {
             </span>
         <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
          <Link to={"/users/"+props.currentUser.username+""} className="nav-link text-dark">Profile</Link>
-         <Link to={"/users/likedBooks"} className="nav-link text-dark">Liked books</Link>
-         <Link to={"/users/reviews"} className="nav-link text-dark">Reviews</Link>
           <div className="dropdown-divider"></div>
           <Link to={"#"} className="nav-link text-dark" onClick={handleLogout}>Logout</Link>
         </div>

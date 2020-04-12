@@ -36,9 +36,9 @@ public class ReviewController {
         return reviewService.listReviewsByMe(currentUser);
     }
 
-    @GetMapping("/book/{bookId}")
-    public List<ReviewResponse> findReviewsByBook(@PathVariable(value="bookId") Long bookId){
-        return reviewService.listReviewsByBook(bookId);
+    @GetMapping("/book/{bookName}")
+    public List<ReviewResponse> findReviewsByBook(@PathVariable(value="bookName") String bookName){
+        return reviewService.listReviewsByBook(bookName);
     }
 
     @PostMapping("/create")

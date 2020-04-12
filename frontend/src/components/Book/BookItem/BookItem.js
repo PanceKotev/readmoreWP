@@ -26,7 +26,7 @@ const BookItem = (props) => {
             </div>
             <div className="col-md-7">
             <div className="card-body bookCard-body">
-                <h5 className="card-title">{props.name.toString().charAt(0).toUpperCase()+props.name.toString().slice(1)}</h5>
+                <h5 className="card-title"><Link to={"/book/"+props.name} style={{color:'#212529'}}>{props.name.toString().charAt(0).toUpperCase()+props.name.toString().slice(1)}</Link></h5>
                 <p className="card-text">{props.description.toString().charAt(0).toUpperCase()+props.description.toString().slice(1)}</p>
                 <p className="card-text">{genreButtons} </p>
                 <p className="card-text"><Link to={"/author/"+props.author} className="text-muted">{props.author.toString().charAt(0).toUpperCase()+props.author.toString().slice(1)}</Link></p>
