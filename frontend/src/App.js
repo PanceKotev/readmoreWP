@@ -70,8 +70,9 @@ class App extends Component {
       });
   }
   componentDidMount(){
-    this.loadCurrentUser();
     this.loadGenreNames();
+    this.loadCurrentUser();
+
    
   }
   render() {
