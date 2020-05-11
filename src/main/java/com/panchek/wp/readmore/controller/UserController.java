@@ -59,7 +59,9 @@ public class UserController {
                         boolean likedBy = bookRepository.bookLikedBy(user.getId(),book.getId());
                     return BookServiceImpl.mapBookToBR(book,likedBy);}
                 ).collect(Collectors.toList()),
-                user.getReviews().stream().map(ReviewServiceImpl::mapReviewToRR).collect(Collectors.toList())
+                user.getReviews().stream().map(review -> {
+                    return ReviewServiceImpl.mapReviewToRR(review,false);
+                }).collect(Collectors.toList())
                 );
 
         return userProfile;

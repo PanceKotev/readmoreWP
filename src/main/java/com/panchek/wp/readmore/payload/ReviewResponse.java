@@ -11,12 +11,15 @@ public class ReviewResponse {
 
     private double rating;
 
-    public ReviewResponse(Long id, String userName, String bookName, String summary, double rating) {
+    private boolean reviewedBy;
+
+    public ReviewResponse(Long id, String userName, String bookName, String summary, double rating, boolean reviewedBy) {
         this.id = id;
         this.userName = userName;
         this.bookName = bookName;
         this.summary = summary;
         this.rating = rating;
+        this.reviewedBy = reviewedBy;
     }
 
     public Long getId() {
@@ -57,5 +60,13 @@ public class ReviewResponse {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public boolean isReviewedBy() {
+        return reviewedBy;
+    }
+
+    public void setReviewedBy(boolean reviewedBy) {
+        this.reviewedBy = reviewedBy;
     }
 }

@@ -29,7 +29,7 @@ class App extends Component {
     this.loadCurrentUser = this.loadCurrentUser.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.loadGenreNames=this.loadGenreNames.bind(this);
-
+    this.getCurrentUser= this.getCurrentUser.bind(this);
   }
   loadCurrentUser = () => {
     this.setState({
@@ -75,6 +75,9 @@ class App extends Component {
 
    
   }
+  getCurrentUser = ()=>{
+    return this.state.currentUser;
+  }
   render() {
     if(this.state.isLoading){
       return <LoadingIndicator/>
@@ -101,7 +104,7 @@ class App extends Component {
             <Route path={"/genre/:genreName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="genre" {...props} />} />
             <Route path={"/author/:authorName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="author" {...props} />} />
             <Route path={"/series/:seriesName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="series" {...props} />} />
-            <PrivateRoute exact path={"/book/:bookName"} user1={this.state.currentUser} authenticated={this.state.isAuthenticated} component={BookDetails}/>
+            <PrivateRoute exact path="/book/:bookName" user1={this.state.currentUser} authenticated={this.state.isAuthenticated} component={BookDetails}/>
             <PrivateRoute exact path="/users/:username" authenticated={this.state.isAuthenticated} component={Profile}/>
           </div>
         </div>

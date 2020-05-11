@@ -37,8 +37,8 @@ public class ReviewController {
     }
 
     @GetMapping("/book/{bookName}")
-    public List<ReviewResponse> findReviewsByBook(@PathVariable(value="bookName") String bookName){
-        return reviewService.listReviewsByBook(bookName);
+    public List<ReviewResponse> findReviewsByBook(@CurrentUser UserPrincipal currentUser, @PathVariable(value="bookName") String bookName){
+        return reviewService.listReviewsByBook(currentUser,bookName);
     }
 
     @PostMapping("/create")

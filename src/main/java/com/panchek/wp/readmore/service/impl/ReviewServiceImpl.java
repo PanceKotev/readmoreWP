@@ -36,19 +36,25 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<ReviewResponse> listReviewsByUser(Long userId) {
         User user=userRepository.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","User id",userId));
-        return reviewRepository.findAllByUser(user).stream().map(review -> mapReviewToRR(review)).collect(Collectors.toList());
+        return reviewRepository.findAllByUser(user).stream().map(review -> mapReviewToRR(review,false)).collect(Collectors.toList());
     }
 
     @Override
     public List<ReviewResponse> listReviewsByMe(UserPrincipal currentUser) {
         User user=userRepository.findById(currentUser.getId()).orElseThrow(()->new ResourceNotFoundException("User","User id",currentUser.getId()));
-        return reviewRepository.findAllByUser(user).stream().map(review -> mapReviewToRR(review)).collect(Collectors.toList());
+        return reviewRepository.findAllByUser(user).stream().map(review -> mapReviewToRR(review,false)).collect(Collectors.toList());
     }
 
     @Override
-    public List<ReviewResponse> listReviewsByBook(String bookName) {
+    public List<ReviewResponse> listReviewsByBook(UserPrincipal currentUser,String bookName) {
         Book book=bookRepository.findByNameEquals(bookName).orElseThrow(()->new ResourceNotFoundException("Book","Book name",bookName));
-        return reviewRepository.findAllByBook(book).stream().map(review -> mapReviewToRR(review)).collect(Collectors.toList());
+        return reviewRepository.findAllByBook(book).stream().map(review -> {
+            boolean reviewedBy = false;
+            if(currentUser!=null){
+                if(currentUser.getId().equals(review.getUser().getId()))
+                    reviewedBy=true;
+            }
+            return mapReviewToRR(review,reviewedBy);}).collect(Collectors.toList());
     }
 
     @Override
@@ -66,7 +72,7 @@ public class ReviewServiceImpl implements ReviewService {
             division=(reviewRepository.getSumOfAllRatings(b.getId())+newRating)/((reviewRepository.countReviewsByBookEquals(b)*1.0)+1);
         else
             division=reviewRepository.getSumOfAllRatings(b.getId())/(reviewRepository.countReviewsByBookEquals(b)*1.0);
-        double stars=Math.round(division*2)/2;
+        double stars=Math.round(division*2)/2.0;
         b.setStarRating(stars);
         b.setPopularity(BookServiceImpl.updatePopularity(b));
         bookRepository.save(b);
@@ -80,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ReviewResponse getReviewById(Long reviewId) {
         Review review=reviewRepository.findById(reviewId).orElseThrow(()->new ResourceNotFoundException("Review","Review Id",reviewId));
-        return new ReviewResponse(review.getId(),review.getUser().getUsername(),review.getBook().getName(),review.getSummary(),review.getRating());
+        return new ReviewResponse(review.getId(),review.getUser().getUsername(),review.getBook().getName(),review.getSummary(),review.getRating(),false);
     }
 
     @Override
@@ -105,11 +111,12 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.save(review);
     }
 
-    public static ReviewResponse mapReviewToRR(Review review){
+    public static ReviewResponse mapReviewToRR(Review review,boolean reviewedBy){
         return new ReviewResponse(review.getId(),
                 review.getUser().getUsername(),
                 review.getBook().getName(),
                 review.getSummary(),
-                review.getRating());
+                review.getRating(),
+                reviewedBy);
     }
 }

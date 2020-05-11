@@ -22,7 +22,7 @@ public class DataLoader implements ApplicationRunner {
     }
 
     public void run(ApplicationArguments args) {
-        List<String> genres=new ArrayList<String>();
+        /*List<String> genres=new ArrayList<String>();
         genres.add("Philosophy");
         bookService.createBook(new BookCreation("Think","Philosophy book",
                 genres,"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRO0I8VktcWPhEIfyOHMJCD8wGa5oUqV0OxWBHQoGRq-0MnBrVx",
@@ -57,6 +57,6 @@ public class DataLoader implements ApplicationRunner {
         bookService.createBook(new BookCreation("The two towers","Uruk-hai sent by Saruman and other Orcs sent by Sauron kill Boromir and capture Merry and Pippin. Aragorn, Gimli and Legolas debate which pair of hobbits to follow.",
                 genres,"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcRDuJkPxiesiukgaKqock6EAf8TdK3boG68LlSoI3DZXLJMfj-u",
                 "J.R.R. Tolkien",LocalDate.of(1954,11,11),800,"English","idk","The lord of the rings"
-        ));
+        ));*/
     }
 }

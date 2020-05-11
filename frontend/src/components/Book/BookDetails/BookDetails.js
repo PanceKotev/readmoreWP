@@ -10,6 +10,8 @@ import ReviewList from '../../Review/ReviewList/ReviewList';
 import RS from '../../../service/reviewService'
 import BR from '../../../service/bookReviewService'
 import ReviewAdd from '../../Review/ReviewAdd/ReviewAdd';
+import {capitalize} from '../../../utils/stringUtils';
+import { toast } from 'react-toastify';
 
 class BookDetails extends Component {
     constructor(props){
@@ -25,7 +27,7 @@ class BookDetails extends Component {
         this.loadBook=this.loadBook.bind(this);
         this.bookUnlike=this.bookUnlike.bind(this);
         this.bookLike=this.bookLike.bind(this);
-        this.getUsername=this.getUsername.bind(this);
+        this.handleReviewDelete=this.handleReviewDelete.bind(this);
     }
     loadBook(bookName){
         this.setState({
@@ -77,6 +79,16 @@ class BookDetails extends Component {
             console.log(error);
         })
     }
+    handleReviewDelete(reviewId){
+        RS.deleteReview(reviewId).then(data=>{
+            toast.success("Review deleted.");
+            this.loadBook(this.props.match.params.bookName);
+        }).catch(data=>{
+            toast.error("Error");
+        })
+       
+        
+    }
     componentDidMount(){
         let bookName=this.props.match.params.bookName;
         this.loadBook(bookName);
@@ -84,21 +96,14 @@ class BookDetails extends Component {
     componentDidUpdate(nextProps){
         if(this.props.match.params.bookName!==nextProps.match.params.bookName){
             this.loadBook(nextProps.match.params.bookName);
+           
         }
-    }
-    getUsername(){
-        if(this.props.match.params.user1){
-            console.log("yeee")
-            return this.props.match.params.user1.username;
-        
-        }
-        return "";
     }
     render() {
         if(this.state.tokenExpired){
            return <Redirect to={"/signin"}/>
         }
-        if(this.state.isLoading){
+        if(this.state.isLoading && !this.state.book){
             return <LoadingIndicator/>
         }
         if(this.state.notFound){
@@ -119,7 +124,7 @@ class BookDetails extends Component {
         let series=[];
         if(this.state.book.seriesName!==""){
            
-            series.push(<Link to={"/series/"+this.state.book.seriesName} className="" style={{color:'#212529'}}><i>{this.state.book.seriesName}</i></Link>);
+            series.push(<Link to={"/series/"+this.state.book.seriesName} className="" style={{color:'#212529'}}><i>{this.state.book.seriesName!==undefined?capitalize(this.state.book.seriesName):""}</i></Link>);
         }
         let likes=[];
         if(this.state.book.liked===true){
@@ -129,17 +134,16 @@ class BookDetails extends Component {
         }
         return (
             <div className="d-block">
-            <div className="d-flex w-100 row mt-5 mx-auto col-12">
-            <div className="col-3">
-                <img src={this.state.book.cover} className="img-fluid w-100 h-100" alt={this.state.book.name}/>
-                
+            <div className=" w-100 row mt-5 mx-auto col-12 pb-2">
+            <div className="col-3 d-block">
+                <img src={this.state.book.cover} className="img-fluid w-95 h-95"  alt={this.state.book.name}/>
                 <span className="text-muted">{this.state.book.datePublished}</span>
-                <div className="">{likes}</div>
+                {likes}
             </div>
             <div className="col-7">
-                <h3>{this.state.book.name}</h3>
+                <h3>{this.state.book.name!==undefined?capitalize(this.state.book.name):""}</h3>
                 <div className="">{series}</div>
-                <span className="text-muted">by {this.state.book.authorName}</span>
+                <span className="text-muted">by {this.state.book.authorName!==undefined?capitalize(this.state.book.authorName):""}</span>
                 <div className="ratings d-flex">
                     <div className="col pl-0 "><Rating style={{ fontSize:'0.6vw',color:'#212529'}} readonly initialRating={this.state.book.starRating} emptySymbol="fa fa-star-o fa-2x" fullSymbol="fa fa-star fa-2x" fractions={2}/></div>
                     <div className="col"><i>likes : {this.state.book.nmbrLikes}</i></div>
@@ -155,8 +159,9 @@ class BookDetails extends Component {
         </div>
         <hr/>
         <div className="bookReviews d-block mt-5">
-           {/*<ReviewAdd userName={this.getUsername()} bookName={this.state.book.name}/> */}
-            <ReviewList reviews={this.state.reviews}/>
+        <p>{this.props.match.params.user1}</p>
+           <ReviewAdd bookName={this.state.book.name} reloadBook={this.loadBook} bookId={this.state.book.id}/>
+            <ReviewList reviews={this.state.reviews} handleReviewDelete={this.handleReviewDelete}/>
         </div>
         </div>
         );
