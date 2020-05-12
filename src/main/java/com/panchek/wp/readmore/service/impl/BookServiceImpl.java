@@ -10,8 +10,10 @@ import com.panchek.wp.readmore.service.BookService;
 import com.panchek.wp.readmore.utils.BookComparator;
 import com.panchek.wp.readmore.utils.PopularityComparator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -151,13 +153,36 @@ public class BookServiceImpl implements BookService {
         return booksSameGenre.stream().map(book -> mapBookToBR(book,false)).collect(Collectors.toList());
     }
 
+    @Override
+    public List<BookReturn> searchBook(UserPrincipal currentUser, String word) {
+        return bookRepository.findAllByNameContaining(word).stream().map(book-> {
+            boolean likedBy=false;
+            if(currentUser!=null){
+                likedBy = bookRepository.bookLikedBy(currentUser.getId(),book.getId());
+            }
+            return mapBookToBR(book,likedBy);}).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteBook(Long bookId) {
+        Book b=bookRepository.findById(bookId).orElseThrow(()->new ResourceNotFoundException("Book","Id",bookId));
+        List<Long> reviewIds = reviewRepository.findAllByBook(b).stream().map(Review::getId).collect(Collectors.toList());
+        int number = bookRepository.countBooksBySeriesEquals(b.getSeries());
+        if(number == 1){
+            seriesRepository.delete(b.getSeries());
+        }
+        reviewRepository.deleteAllByIdIn(reviewIds);
+        bookRepository.delete(b);
+    }
+
 
     public static double updatePopularity(Book b) {
         int likedBy=b.getLikedBy().size();
         int nmrReviews=b.getReviews().size();
         int viewCount=b.getViews();
         double starCount=b.getStarRating();
-        return (0.5*likedBy)+(0.3*nmrReviews)+(0.05*viewCount)+starCount;
+        return (0.5*likedBy)+(0.3*nmrReviews)+(0.05*viewCount)+1.2*starCount;
     }
 
 

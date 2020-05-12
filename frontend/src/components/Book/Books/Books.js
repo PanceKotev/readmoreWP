@@ -8,6 +8,7 @@ import LoadingIndicator from "../../common/LoadingIndicator/LoadingIndicator"
 import UServ from "../../../service/userService"
 import "./Books.css"
 import BookDetails from '../BookDetails/BookDetails';
+import { toast } from 'react-toastify';
 
 
 class Books extends Component {
@@ -22,6 +23,7 @@ class Books extends Component {
         }
         this.handleLike=this.handleLike.bind(this);
         this.handleUnlike=this.handleUnlike.bind(this);
+        this.bookDelete=this.bookDelete.bind(this);
 
     }
     loadBooks(listBy){
@@ -54,6 +56,29 @@ class Books extends Component {
         }
         case "series":{
             BS.listBooksBySeries(this.props.match.params.seriesName).then((data)=>{
+                this.setState({
+                    books:data.data,
+                    isLoading:false
+                })
+            }).catch(error=>{
+                let code=error.message.slice(error.message.length-3).trim();
+                if(code === '404'){
+                    this.setState({
+                        isLoading:false,
+                        notFound:true
+                    })
+                }
+                else{
+                    this.setState({
+                        isLoading:false,
+                        serverError:true
+                    })
+                }
+            })
+            break;
+        }
+        case "search":{
+            BS.searchBook(this.props.match.params.searchWord).then((data)=>{
                 this.setState({
                     books:data.data,
                     isLoading:false
@@ -159,6 +184,21 @@ class Books extends Component {
             console.log(error);
         });
     };
+    bookDelete(bookId){
+        BS.deleteBook(bookId).then((data)=>{
+            toast.success("Book deleted.");
+            this.setState((prevState)=>{
+                let newBooks=prevState.books.filter((b)=>{
+                    return b.id !== bookId;
+                })
+                return {
+                  "books": newBooks
+                }
+              });
+        }).catch(error=>{
+            console.log(error);
+        });
+    };
     componentDidMount(){
         let listType= this.props.listTypeBy;
         this.loadBooks(listType);
@@ -170,6 +210,8 @@ class Books extends Component {
             this.loadBooks("author");
         }else if(this.props.listTypeBy === "series" && (this.props.match.params.seriesName !== nextProps.match.params.seriesName)){
             this.loadBooks("series");
+        }else if(this.props.listTypeBy === "search" && (this.props.match.params.searchWord !== nextProps.match.params.searchWord)){
+            this.loadBooks("search");
         }
     }
     render() {
@@ -185,20 +227,27 @@ class Books extends Component {
         if(this.props.listTypeBy === "author"){
             return (<div className="row row-cols-1 ">
             <div className="d-block mx-auto text-center w-100"><div className="heading-t">Books from the author <b>{this.props.match.params.authorName.toString().charAt(0).toUpperCase()+this.props.match.params.authorName.toString().slice(1)}</b></div></div>
-            <BookList handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/>
+            <BookList handleDelete={this.bookDelete} handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/>
             </div>);
         }
         if(this.props.listTypeBy === "genre"){
             return (
                 <div className="row row-cols-1">
                 <div className="d-block mx-auto text-center w-100"><div className="heading-t">Books from the genre <b>{this.props.match.params.genreName.toString().charAt(0).toUpperCase()+this.props.match.params.genreName.toString().slice(1)}</b></div></div>
-                <BookList handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
+                <BookList handleDelete={this.bookDelete} handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
         }
         if(this.props.listTypeBy === "series"){
             return (
                 <div className="row row-cols-1">
                 <div className="d-block mx-auto text-center w-100"><div className="heading-t">Books from the series <b>{this.props.match.params.seriesName.toString().charAt(0).toUpperCase()+this.props.match.params.seriesName.toString().slice(1)}</b></div></div>
-                <BookList handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
+                <BookList handleDelete={this.bookDelete} handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/></div>);
+        }
+        if(this.props.listTypeBy === "search"){
+            return (
+                <div className="row row-cols-1">
+                <div className="d-block mx-auto text-center w-100"><div className="heading-t">Search results: </div></div>
+                {this.state.books.length===0?<b>No results found from that search.</b>:<BookList handleDelete={this.bookDelete} handleLike={this.handleLike} handleUnlike={this.handleUnlike} authenticated={this.props.authenticated} books={this.state.books}/>}
+                </div>);
         }
         return (
                 <BookCardCarousel authenticated={this.props.authenticated} handleLike={this.handleLike} handleUnlike={this.handleUnlike} books={this.state.books} />

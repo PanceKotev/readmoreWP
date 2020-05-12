@@ -12,14 +12,16 @@ public class UserProfile {
     private Instant joinedAt;
     private List<BookReturn> likedBooks;
     private List<ReviewResponse> reviews;
+    private String roleName;
 
-    public UserProfile(Long id, String username, String name, Instant joinedAt,List<BookReturn> likedBooks,List<ReviewResponse> reviews) {
+    public UserProfile(Long id, String username, String name, Instant joinedAt,List<BookReturn> likedBooks,List<ReviewResponse> reviews,String roleName) {
         this.id = id;
         this.username = username;
         this.name = name;
         this.joinedAt = joinedAt;
         this.likedBooks = likedBooks;
         this.reviews=reviews;
+        this.roleName= roleName;
     }
 
     public Long getId() {
@@ -68,5 +70,13 @@ public class UserProfile {
 
     public void setReviews(List<ReviewResponse> reviews) {
         this.reviews = reviews;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 }

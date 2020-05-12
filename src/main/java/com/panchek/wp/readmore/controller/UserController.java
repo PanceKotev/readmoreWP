@@ -1,6 +1,7 @@
 package com.panchek.wp.readmore.controller;
 
 import com.panchek.wp.readmore.exception.ResourceNotFoundException;
+import com.panchek.wp.readmore.model.Role;
 import com.panchek.wp.readmore.model.User;
 import com.panchek.wp.readmore.payload.*;
 import com.panchek.wp.readmore.repository.BookRepository;
@@ -34,9 +35,12 @@ public class UserController {
     private static final Logger logger= LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser){
-        return new UserSummary(currentUser.getId(),currentUser.getUsername(),currentUser.getName());
+        User u = userRepository.getOne(currentUser.getId());
+        Role role= (Role) u.getRoles().toArray()[0];
+        String rolename= role.getName().name();
+        return new UserSummary(currentUser.getId(),currentUser.getUsername(),currentUser.getName(),rolename);
     }
 
     @GetMapping("/checkUsernameAvailability")
@@ -53,6 +57,8 @@ public class UserController {
     @GetMapping("/{username}")
     public UserProfile getUserProfile(@PathVariable(value = "username") String username){
         User user=userRepository.findByUsername(username).orElseThrow(()->new ResourceNotFoundException("User","Username",username));
+        Role role= (Role) user.getRoles().toArray()[0];
+        String rolename= role.getName().name();
         UserProfile userProfile=new UserProfile(
                 user.getId(),user.getUsername(),user.getName(),user.getCreatedAt(),
                 user.getLikedBooks().stream().map(book ->{
@@ -61,7 +67,8 @@ public class UserController {
                 ).collect(Collectors.toList()),
                 user.getReviews().stream().map(review -> {
                     return ReviewServiceImpl.mapReviewToRR(review,false);
-                }).collect(Collectors.toList())
+                }).collect(Collectors.toList()),
+               rolename
                 );
 
         return userProfile;

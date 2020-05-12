@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import UServ from "../../../service/userService";
 import NotFound from "../../common/NotFound/NotFound";
 import ServerError from "../../common/ServerError/ServerError";
-import {withRouter, Redirect} from 'react-router-dom';
+import {withRouter, Redirect, Link} from 'react-router-dom';
 import LoadingIndicator from '../../common/LoadingIndicator/LoadingIndicator';
 import BookList from '../../Book/BookList/BookList';
 import ReviewList from '../../Review/ReviewList/ReviewList';
@@ -96,7 +96,7 @@ class Profile extends Component {
         }
         if(this.state.user){
         return (
-            <div className="row">
+            <div className="row w-100">
                    <div className="d-block mr-auto m-3 p-3">
                         <h5>Username : <b>{this.state.user.username}</b></h5>
                         <h5>Name: <b>{this.state.user.name}</b></h5>
@@ -108,10 +108,10 @@ class Profile extends Component {
                         <a className="nav-link" id="reviews-tab" data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews</a>
                     </li>
                 </ul>
-                <div className="tab-content" id="myTabContent">
-                    <div className="tab-pane fade show active" id="likedbooks" role="tabpanel" aria-labelledby="liked-books-tab"><BookList handleLike={this.bookLike} handleUnlike={this.bookUnlike} authenticated={true} books={this.state.books}/></div>
+                <div className="tab-content w-100" id="myTabContent">
+                    <div className="tab-pane fade show active" id="likedbooks" role="tabpanel" aria-labelledby="liked-books-tab">{this.state.books.length=== 0?<p>You havent liked any books.</p>:<BookList handleLike={this.bookLike} handleUnlike={this.bookUnlike} authenticated={true} books={this.state.books}/>}</div>
                     <div className="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
-                    <ReviewList reviews={this.state.reviews}></ReviewList></div>
+                    {this.state.reviews.length=== 0?<p>You haven't left any reviews anywhere.</p>:<ReviewList reviews={this.state.reviews}></ReviewList>}</div>
                 </div>
                    </div>
                    
@@ -119,10 +119,10 @@ class Profile extends Component {
         );}
         return (
             <div className="row">
-                Error
+                JWT token expired, <Link to={"#"} className="link-no-decor" onclick={()=>this.props.jwtRefresh}> Logout.</Link>
             </div>
         );
     }
 }
 
-export default Profile;
+export default withRouter(Profile);

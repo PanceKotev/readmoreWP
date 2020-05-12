@@ -29,15 +29,13 @@ const ReviewAdd = (props) => {
             toast.success("You've added a review!");
             props.reloadBook(props.bookName);
         }).catch(data=>{
-            console.log(data);
             toast.error("Error!")
             props.history.push("/");
         })
     }
     useEffect(()=>{
         setLoading(true)
-        Auth.getCurrentUser().then(data=>{
-            
+        Auth.getCurrentUser().then(data=>{ 
             setUser(data.data)
             setLoading(false)
         }).catch(data=>{

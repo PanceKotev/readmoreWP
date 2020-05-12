@@ -15,6 +15,7 @@ import com.panchek.wp.readmore.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,9 @@ public class ReviewServiceImpl implements ReviewService {
                 if(currentUser.getId().equals(review.getUser().getId()))
                     reviewedBy=true;
             }
-            return mapReviewToRR(review,reviewedBy);}).collect(Collectors.toList());
+            return mapReviewToRR(review,reviewedBy);}).sorted(
+                    Comparator.comparing(ReviewResponse::isReviewedBy,
+                            Comparator.comparing((Boolean aBoolean) -> aBoolean == false).thenComparing(Comparator.naturalOrder()))).collect(Collectors.toList());
     }
 
     @Override

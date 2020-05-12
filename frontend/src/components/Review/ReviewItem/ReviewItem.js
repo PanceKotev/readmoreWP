@@ -10,14 +10,13 @@ const ReviewItem = (props) => {
         if(choice){
             props.handleDelete(props.review.id);}
         else{
-
         }
     }
     return (
         <div className="d-flex w-100 row my-2 mx-auto">
-            <div className="col-1">
+            <div className="col-1 d-block">
             
-                <img src={avatar} className="img-fluid w-60 h-60 d-inline-block" width="75px" height="75px" alt={props.review.userName}/>
+                <img src={avatar} className="img-fluid w-65 h-65 d-block" width="75px" height="75px" alt={props.review.userName}/>
                 
             </div>
             <div className="col-10 pl-0 my-auto">
@@ -28,7 +27,7 @@ const ReviewItem = (props) => {
                 {props.review.summary}
             </p>
             <p>
-               {props.review.reviewedBy===true?<button className="btn btn-sm btn-danger" onClick={(e) => { if (window.confirm('Delete review??')) deleteReview(true)}}>delete</button>:""}
+               {props.review.reviewedBy===true || props.userRole==="ROLE_ADMIN"?<button className="btn btn-sm btn-danger" onClick={(e) => { if (window.confirm('Delete review??')) deleteReview(true)}}>delete</button>:""}
             </p>
         </div>
     </div>

@@ -9,7 +9,7 @@ const BookCard = (props) => {
     })
     let likeButton=[];
     if (!props.authenticated){
-       likeButton= <i className="fa fa-heart" style={{fontSize:'2.5vw'}}></i>
+       likeButton= [];
     }
     else if(props.liked === true){
         likeButton= <i className="fa fa-heart" style={{fontSize:'2.5vw',color:'#235952',cursor:'pointer'}} onClick={()=>props.handleUnlike(props.id)}></i>

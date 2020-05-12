@@ -28,4 +28,7 @@ public interface BookService {
 
     List<BookReturn> listSimilarBooksTo(Long id);
 
+    List<BookReturn> searchBook(UserPrincipal currentUser, String word);
+
+    void deleteBook(Long bookId);
 }

@@ -28,6 +28,8 @@ public interface BookRepository extends JpaRepository<Book,Long> {
 
     List<Book> findAllByNameContaining(String name);
 
+    int countBooksBySeriesEquals(Series s);
+
     List<Book> findAllByIdIn(List<Long> bookIds);
 
     List<Book> findTop5ByOrderByPopularityDesc();

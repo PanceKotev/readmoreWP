@@ -13,6 +13,7 @@ import PrivateRoute from "./components/common/PrivateRoute/PrivateRoute"
 import LoadingIndicator from "./components/common/LoadingIndicator/LoadingIndicator"
 import GS from "./service/genreService"
 import BookDetails from './components/Book/BookDetails/BookDetails';
+import BookAdd from './components/Book/BookAdd/BookAdd';
 
 class App extends Component {
   
@@ -29,7 +30,6 @@ class App extends Component {
     this.loadCurrentUser = this.loadCurrentUser.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.loadGenreNames=this.loadGenreNames.bind(this);
-    this.getCurrentUser= this.getCurrentUser.bind(this);
   }
   loadCurrentUser = () => {
     this.setState({
@@ -75,9 +75,6 @@ class App extends Component {
 
    
   }
-  getCurrentUser = ()=>{
-    return this.state.currentUser;
-  }
   render() {
     if(this.state.isLoading){
       return <LoadingIndicator/>
@@ -101,11 +98,14 @@ class App extends Component {
             </Route>
             <Route path={"/"} exact ><Books authenticated={this.state.isAuthenticated} listTypeBy=""/>
               </Route>
-            <Route path={"/genre/:genreName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="genre" {...props} />} />
+            
+            <Route path={"/genre/:genreName"} user={this.state.currentUser} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="genre" {...props} />} />
             <Route path={"/author/:authorName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="author" {...props} />} />
             <Route path={"/series/:seriesName"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="series" {...props} />} />
-            <PrivateRoute exact path="/book/:bookName" user1={this.state.currentUser} authenticated={this.state.isAuthenticated} component={BookDetails}/>
-            <PrivateRoute exact path="/users/:username" authenticated={this.state.isAuthenticated} component={Profile}/>
+            <Route path={"/search/:searchWord"} render={(props)=><Books authenticated={this.state.isAuthenticated} listTypeBy="search" {...props} />} />
+            <PrivateRoute path={"/books/create"} authenticated ={this.state.isAuthenticated} component={BookAdd} exact ></PrivateRoute>
+            <PrivateRoute exact path="/book/:bookName" user={this.state.currentUser} authenticated={this.state.isAuthenticated} component={BookDetails}/>
+            <PrivateRoute exact path="/users/:username" jwtRefresh={this.handleLogout} authenticated={this.state.isAuthenticated} component={Profile}/>
           </div>
         </div>
         </Router>

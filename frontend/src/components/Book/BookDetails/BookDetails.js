@@ -22,22 +22,26 @@ class BookDetails extends Component {
             notFound:false,
             serverError:false,
             reviews:[],
-            tokenExpired:false
+            tokenExpired:false,
+            reviewExists:false
         }
         this.loadBook=this.loadBook.bind(this);
         this.bookUnlike=this.bookUnlike.bind(this);
         this.bookLike=this.bookLike.bind(this);
         this.handleReviewDelete=this.handleReviewDelete.bind(this);
+        this.deleteBook = this.deleteBook.bind(this);
     }
     loadBook(bookName){
         this.setState({
             isLoading:true
         });
         BR.getBookAndReviews(bookName).then((data)=>{
+            let exists = data[1].data.some(el=>el.reviewedBy===true);
             this.setState({
                 book:data[0].data,
                 reviews:data[1].data,
-                isLoading:false
+                isLoading:false,
+                reviewExists:exists
             })
 
         }).catch(error=>{
@@ -89,10 +93,19 @@ class BookDetails extends Component {
        
         
     }
+    deleteBook(){
+        BS.deleteBook(this.state.book.id).then(data=>{
+            toast.success("Book deleted.")
+            this.props.history.push("/");
+        }).catch(data=>{
+            toast.error("Server error");
+        })
+    }
     componentDidMount(){
         let bookName=this.props.match.params.bookName;
         this.loadBook(bookName);
     }
+
     componentDidUpdate(nextProps){
         if(this.props.match.params.bookName!==nextProps.match.params.bookName){
             this.loadBook(nextProps.match.params.bookName);
@@ -143,7 +156,7 @@ class BookDetails extends Component {
             <div className="col-7">
                 <h3>{this.state.book.name!==undefined?capitalize(this.state.book.name):""}</h3>
                 <div className="">{series}</div>
-                <span className="text-muted">by {this.state.book.authorName!==undefined?capitalize(this.state.book.authorName):""}</span>
+                <span className="text-muted">by <Link to={"/author/"+this.state.book.authorName} style={{color:'#7e758c'}}>{this.state.book.authorName!==undefined?capitalize(this.state.book.authorName):""}</Link></span>
                 <div className="ratings d-flex">
                     <div className="col pl-0 "><Rating style={{ fontSize:'0.6vw',color:'#212529'}} readonly initialRating={this.state.book.starRating} emptySymbol="fa fa-star-o fa-2x" fullSymbol="fa fa-star fa-2x" fractions={2}/></div>
                     <div className="col"><i>likes : {this.state.book.nmbrLikes}</i></div>
@@ -155,13 +168,14 @@ class BookDetails extends Component {
                 <hr/>
                 <div className="genres d-flex">{genres}</div>
                 <a href={this.state.book.downloadList} type="button" className="btn btn-sm btn-light">Download</a>
+                {this.props.user.roleName==="ROLE_ADMIN"?<button className="btn btn-sm btn-danger d-block mt-1" onClick={(e) => { if (window.confirm('Delete book??')) this.deleteBook()} }>Delete</button>:""}
+                
             </div>
         </div>
         <hr/>
         <div className="bookReviews d-block mt-5">
-        <p>{this.props.match.params.user1}</p>
-           <ReviewAdd bookName={this.state.book.name} reloadBook={this.loadBook} bookId={this.state.book.id}/>
-            <ReviewList reviews={this.state.reviews} handleReviewDelete={this.handleReviewDelete}/>
+           {this.state.reviewExists!==true?<ReviewAdd bookName={this.state.book.name} reloadBook={this.loadBook} bookId={this.state.book.id}/>:""}
+            <ReviewList reviews={this.state.reviews} handleReviewDelete={this.handleReviewDelete} userRole={this.props.user.roleName} />
         </div>
         </div>
         );

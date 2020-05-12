@@ -7,9 +7,14 @@ const BookItem = (props) => {
     const genreButtons= props.genres.map((genre,index)=>{
         return (<Link to={"/genre/"+genre} type="button" className="btn btn-info btn-sm mr-1 mb-1 p-1 genre">{genre.toString().charAt(0).toUpperCase()+genre.toString().slice(1)}</Link>)
     });
+    const deleteBook=(agreenment)=>{
+        if(agreenment){
+            props.handleDelete(props.id);
+        }
+    }
     let likeButton=[];
     if (!props.authenticated){
-       likeButton= <i className="fa fa-heart" style={{fontSize:'1.8vw'}}></i>
+       likeButton= [];
     }
     else if(props.liked === true){
         likeButton= <i className="fa fa-heart" style={{fontSize:'1.8vw',color:'#235952',cursor:'pointer'}} onClick={()=>props.handleUnlike(props.id)}></i>
@@ -33,6 +38,7 @@ const BookItem = (props) => {
                 <p className="card-text d-flex align-content-between"><Rating style={{cursor:'pointer', fontSize:'1vw'}} className="mr-auto" readonly initialRating={props.stars} emptySymbol="fa fa-star-o fa-2x" fullSymbol="fa fa-star fa-2x" fractions={2}/>
                 {likeButton}</p>
                 <p className="card-text"><small className="text-muted">{props.datePublished}</small></p>
+                {props.user!==null?props.user.roleName==="ROLE_ADMIN"?<p className="card-text"><button className="btn btn-sm btn-danger" onClick={(e) => { if (window.confirm('Delete book??')) deleteBook(true)}}>delete</button></p>:"":""}
             </div>
             </div>
         </div>

@@ -52,7 +52,7 @@ const Register = (props) => {
                     <input id="username" className="form-control text-center" type="text" required/>
                     <br/>
                     <label htmlFor="email">Email:</label>
-                    <input id="email" className="form-control text-center" autoFocus type="email" required/>
+                    <input id="email" className="form-control text-center"  type="email" required/>
                 <br/>
                 <label htmlFor="password">Password:</label>
                 <input id="password" className="form-control text-center" type="password" required/>

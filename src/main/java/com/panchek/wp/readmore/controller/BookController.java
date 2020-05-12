@@ -1,6 +1,7 @@
 package com.panchek.wp.readmore.controller;
 
 import com.panchek.wp.readmore.model.Book;
+import com.panchek.wp.readmore.model.User;
 import com.panchek.wp.readmore.payload.ApiResponse;
 import com.panchek.wp.readmore.payload.BookCreation;
 import com.panchek.wp.readmore.payload.BookReturn;
@@ -10,6 +11,7 @@ import com.panchek.wp.readmore.service.impl.BookServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -28,6 +30,17 @@ public class BookController {
     @GetMapping("/genre/{genre}")
     public List<BookReturn> getBooksByGenre(@CurrentUser UserPrincipal currentUser, @PathVariable(value="genre") String genre){
         return bookService.listBooksByGenre(currentUser, genre.trim().toLowerCase());
+    }
+
+    @GetMapping("/search/{searchword}")
+    public List<BookReturn> searchBooks(@CurrentUser UserPrincipal currentUser,@PathVariable(value="searchword") String searchword){
+        return bookService.searchBook(currentUser,searchword.trim().toLowerCase());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<?> deleteBook(@PathVariable(value="bookId") Long bookId){
+        bookService.deleteBook(bookId);
+        return ResponseEntity.ok(new ApiResponse(true,"Book deleted successfully!"));
     }
 
     @PostMapping("/create")

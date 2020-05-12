@@ -10,6 +10,9 @@ const UServ = {
     },
     unlikeBook:(bookId)=>{
         return apiUtils.get("user/unlike/"+bookId);
+    },
+    getUserSummary:(username)=>{
+        return apiUtils.get("/user/me");
     }
 }
 export default UServ;

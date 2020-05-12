@@ -4,6 +4,7 @@ import com.panchek.wp.readmore.model.Book;
 import com.panchek.wp.readmore.model.Review;
 import com.panchek.wp.readmore.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,6 @@ public interface ReviewRepository extends JpaRepository<Review,Long> {
     boolean existsByUserIdAndBookId(Long userId,Long bookId);
 
     void deleteById(Long reviewId);
+
+    void deleteAllByIdIn(List<Long> reviewIds);
 }

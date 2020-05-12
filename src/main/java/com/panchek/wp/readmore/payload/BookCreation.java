@@ -12,7 +12,7 @@ public class BookCreation {
     @Size(min=3,max=40)
     String name;
     @NotBlank
-    @Size(min=10, max=150)
+    @Size(min=10, max=250)
     String shortDescription;
 
     List<String> genreNames;
